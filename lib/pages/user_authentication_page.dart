@@ -34,7 +34,9 @@ class SignInPageState extends State<UserAuthenticationPage> {
                         behavior: SnackBarBehavior.floating,
                         duration: Duration(milliseconds: 600),
                         content: CustomText(
-                          text: "Logged In Successfully!!!",
+                          text: firebaseAuthState.isSignInPage
+                              ? "Logged In Successfully!!!"
+                              : "Signed Up Successfully!!!",
                           textColor: AppColor.whiteColor,
                         ),
                         backgroundColor: AppColor.confirmColor,
