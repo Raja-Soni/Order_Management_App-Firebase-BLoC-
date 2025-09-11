@@ -1,0 +1,47 @@
+import 'package:flutter/material.dart';
+
+class AppColor {
+  static Color signInAndSignUpPageThemeColor = Colors.blue.shade800;
+  static Color transparentColor = Colors.transparent;
+  static Color scaffoldLightBackgroundColor = Colors.blueGrey.shade50;
+  static Color scaffoldDarkBackgroundColor = Colors.grey.shade900;
+  static Color circularProgressLightColor = Colors.black;
+  static Color circularProgressDarkColor = Colors.white;
+  static Color appbarDarkThemeColor = Colors.black;
+  static Color appbarLightThemeColor = Colors.blue;
+  static Color appbarTitleTextColor = Colors.white;
+  static Color darkThemeColor = Colors.grey[850]!;
+  static Color lightThemeColor = Colors.white;
+  static Color dividerLightColor = Colors.grey.shade900;
+  static Color dividerDarkColor = Colors.white54;
+  static Color buttonDarkThemeColor = Colors.black;
+  static Color buttonLightThemeColor = Colors.blue;
+  static Color alertBtnTextLightColor = Colors.black;
+  static Color alertBtnTextDarkColor = Colors.white;
+  static Color alertBtnLightColor = Colors.white70;
+  static Color alertBtnDarkColor = Colors.grey.shade900;
+  static Color iconLightThemeColor = Colors.black;
+  static Color iconDarkThemeColor = Colors.white;
+  static Color textLightThemeColor = Colors.black;
+  static Color textDarkThemeColor = Colors.white;
+  static Color switchActiveTrackColor = Colors.grey.shade800;
+  static Color switchInactiveTrackColor = Colors.blue.shade100;
+  static Color confirmColor = Colors.green;
+  static Color cancelColor = Colors.red;
+  static Color containerDarkThemeColor = Colors.grey.shade800;
+  static Color containerLightThemeColor = Colors.grey.shade400;
+  static Color editIconLightThemeColor = Colors.blueGrey.shade700;
+  static Color editIconDarkThemeColor = Colors.lightBlueAccent.shade200;
+  static Color pendingOrderColor = Colors.orange;
+  static Color deliveredOrderColor = Colors.green;
+  static Color cancelledOrderColor = Colors.redAccent;
+  static Color whiteColor = Colors.white;
+  static Color amountTextLightThemeColor = Color(0xFF2E7D32);
+  static Color amountTextDarkThemeColor = Colors.blue;
+  static Color darkGreyColor = Colors.grey.shade900;
+  static Color blueGreyColor = Colors.blueGrey;
+  static Color darkBlueGreyColor = Colors.blueGrey.shade900;
+  static Color dialogBackgroundLightThemeColor = Colors.white;
+  static Color dialogBackgroundDarkThemeColor = Colors.grey.shade900;
+  static Color focusColor = Colors.yellow;
+}
