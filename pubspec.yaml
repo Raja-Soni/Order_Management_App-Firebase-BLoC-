@@ -59,7 +59,7 @@ flutter_native_splash:
     icon_background_color_dark: "#212121"
 
 flutter_launcher_icons:
-    image_path: "assets/images/order_management_app_web_logo-512.png"
+    image_path: "assets/images/order_management_app_logo.png"
     android: "launcher_icon"
     ios: false
     remove_alpha_ios: true

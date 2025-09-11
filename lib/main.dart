@@ -4,12 +4,12 @@ import 'package:com.example.order_management_application/bloc/dark_theme_mode/da
 import 'package:com.example.order_management_application/bloc/firebase_auth/firebase_auth_bloc.dart';
 import 'package:com.example.order_management_application/bloc/new_order/new_order_bloc_events_state.dart';
 import 'package:com.example.order_management_application/custom_widgets/import_all_custom_widgets.dart';
+import 'package:com.example.order_management_application/firebase_options.dart';
 import 'package:com.example.order_management_application/pages/all_pages.dart';
 import 'package:com.example.order_management_application/routes/all_routes.dart';
 import 'package:com.example.order_management_application/utils/enums.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,22 +17,7 @@ import 'AppColors/app_colors.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (kIsWeb) {
-    await Firebase.initializeApp(
-      options: FirebaseOptions(
-        apiKey: "AIzaSyC0i_yhW98vdfh6rvQO6VJKlGuNv3DUEKE",
-        authDomain: "order-management-applica-7cae6.firebaseapp.com",
-        projectId: "order-management-applica-7cae6",
-        storageBucket: "order-management-applica-7cae6.firebasestorage.app",
-        messagingSenderId: "334427476550",
-        appId: "1:334427476550:web:4aee68d68516ffa219b047",
-        measurementId: "G-57G8HX7YBS",
-      ),
-    );
-  } else {
-    await Firebase.initializeApp();
-  }
-
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }
 
