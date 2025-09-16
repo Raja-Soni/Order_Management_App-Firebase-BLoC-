@@ -25,3 +25,10 @@ class CredentialGiven extends FirebaseAuthEvents {
 class AuthenticateUser extends FirebaseAuthEvents {}
 
 class LogoutUser extends FirebaseAuthEvents {}
+
+class IsForgotPassMailSent extends FirebaseAuthEvents {
+  final bool? isMailSent;
+  IsForgotPassMailSent({this.isMailSent});
+}
+
+class ForgotPasswordMailSentEvent extends FirebaseAuthEvents {}

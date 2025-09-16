@@ -170,6 +170,27 @@ class SignInPageState extends State<UserAuthenticationPage> {
                                       return null;
                                     },
                                   ),
+                                  firebaseAuthState.isSignInPage
+                                      ? Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pushNamed(
+                                                  context,
+                                                  RouteNames.forgotPasswordPage,
+                                                );
+                                              },
+                                              child: CustomText(
+                                                text: "Forgot Password",
+                                                textColor: AppColor
+                                                    .signInAndSignUpPageThemeColor,
+                                              ),
+                                            ),
+                                          ],
+                                        )
+                                      : SizedBox.shrink(),
                                   SizedBox(height: 30),
                                   firebaseAuthState.isLoading == true
                                       ? CircularProgressIndicator(

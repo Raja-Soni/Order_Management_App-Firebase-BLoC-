@@ -256,9 +256,17 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                 context:
                                                                     context,
                                                                 builder: (context) => AlertDialog(
+                                                                  backgroundColor:
+                                                                      darkModeState
+                                                                          .darkTheme
+                                                                      ? AppColor
+                                                                            .darkThemeColor
+                                                                      : AppColor
+                                                                            .lightThemeColor,
                                                                   contentPadding:
-                                                                      EdgeInsets
-                                                                          .zero,
+                                                                      EdgeInsets.all(
+                                                                        20,
+                                                                      ),
                                                                   content: ClipRRect(
                                                                     borderRadius:
                                                                         BorderRadius.circular(

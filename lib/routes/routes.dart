@@ -12,6 +12,11 @@ class Routes {
           type: PageTransitionType.fade,
           child: const UserAuthenticationPage(),
         );
+      case RouteNames.forgotPasswordPage:
+        return PageTransition(
+          type: PageTransitionType.fade,
+          child: const ForgotPassWordPage(),
+        );
       case RouteNames.myHomePage:
         return PageTransition(
           type: PageTransitionType.fade,

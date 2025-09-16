@@ -7,6 +7,7 @@ class FirebaseAuthState extends Equatable {
   final String errorMessage;
   final String email;
   final String password;
+  final bool isForgotPassMailSent;
 
   const FirebaseAuthState({
     this.isLoading = false,
@@ -15,6 +16,7 @@ class FirebaseAuthState extends Equatable {
     this.errorMessage = "",
     this.email = "",
     this.password = "",
+    this.isForgotPassMailSent = false,
   });
 
   FirebaseAuthState copyWith({
@@ -24,6 +26,7 @@ class FirebaseAuthState extends Equatable {
     String? errorMessage,
     String? email,
     String? password,
+    bool? isForgotPassMailSent,
   }) {
     return FirebaseAuthState(
       isLoading: isLoading ?? this.isLoading,
@@ -32,6 +35,7 @@ class FirebaseAuthState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
       email: email ?? this.email,
       password: password ?? this.password,
+      isForgotPassMailSent: isForgotPassMailSent ?? this.isForgotPassMailSent,
     );
   }
 
@@ -43,5 +47,6 @@ class FirebaseAuthState extends Equatable {
     errorMessage,
     email,
     password,
+    isForgotPassMailSent,
   ];
 }

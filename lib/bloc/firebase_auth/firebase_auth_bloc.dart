@@ -11,6 +11,8 @@ class FirebaseAuthBloc extends Bloc<FirebaseAuthEvents, FirebaseAuthState> {
     on<AuthenticateUser>(authenticateUser);
     on<CredentialGiven>(credentialGiven);
     on<LogoutUser>(logoutUser);
+    on<IsForgotPassMailSent>(isForgotPassMailSent);
+    on<ForgotPasswordMailSentEvent>(forgotPasswordMailSentEvent);
   }
 
   FutureOr<void> isSignInPage(
@@ -90,5 +92,30 @@ class FirebaseAuthBloc extends Bloc<FirebaseAuthEvents, FirebaseAuthState> {
     } catch (e) {
       emit(state.copyWith(errorMessage: e.toString()));
     }
+  }
+
+  FutureOr<void> isForgotPassMailSent(
+    IsForgotPassMailSent event,
+    Emitter<FirebaseAuthState> emit,
+  ) {
+    emit(state.copyWith(isForgotPassMailSent: event.isMailSent));
+  }
+
+  FutureOr<void> forgotPasswordMailSentEvent(
+    ForgotPasswordMailSentEvent event,
+    Emitter<FirebaseAuthState> emit,
+  ) async {
+    print("Email ID:::::::::::::::::::::::::::::::: ${state.email}");
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: state.email).onError((
+      error,
+      stackTrace,
+    ) {
+      emit(
+        state.copyWith(
+          errorMessage:
+              "Error: ${error.toString()} \n Stack Trace: ${stackTrace.toString()}",
+        ),
+      );
+    });
   }
 }
