@@ -10,13 +10,26 @@ import 'package:com.example.order_management_application/routes/all_routes.dart'
 import 'package:com.example.order_management_application/utils/enums.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'AppColors/app_colors.dart';
 
+const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (kIsWeb) {
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  } else {
+    await dotenv.load(fileName: ".env");
+    final supabaseUrl = dotenv.env['SUPABASE_URL']!;
+    final supabaseAnonKey = dotenv.env['SUPABASE_ANON_KEY']!;
+    await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
+  }
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(MyApp());
 }

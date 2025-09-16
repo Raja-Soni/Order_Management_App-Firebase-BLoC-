@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:com.example.order_management_application/model/all_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,6 +12,8 @@ class NewOrderState extends Equatable {
   late final int price;
   final String isDelivered;
   final int totalPrice;
+  final String? localImagePath;
+  final Uint8List? webLocalItemImage;
   final List<NewOrderDetailsItemModel> itemDetails;
   final String selectedUnit;
   final units = ['kg', 'g', 'L', 'ml', 'pc', 'dozen', 'box', 'meter', 'cm'];
@@ -25,6 +29,8 @@ class NewOrderState extends Equatable {
     this.isDelivered = "Pending",
     this.itemDetails = const [],
     this.selectedUnit = 'kg',
+    this.localImagePath,
+    this.webLocalItemImage = null,
   });
 
   NewOrderState copyWith({
@@ -38,6 +44,9 @@ class NewOrderState extends Equatable {
     int? totalPrice,
     List<NewOrderDetailsItemModel>? itemDetails,
     String? selectedUnit,
+    String? localImagePath,
+    Uint8List? webLocalItemImage,
+    bool clearWebImage = false,
   }) {
     return NewOrderState(
       customerName: customerName ?? this.customerName,
@@ -50,6 +59,10 @@ class NewOrderState extends Equatable {
       totalPrice: totalPrice ?? this.totalPrice,
       itemDetails: itemDetails ?? this.itemDetails,
       selectedUnit: selectedUnit ?? this.selectedUnit,
+      localImagePath: localImagePath ?? this.localImagePath,
+      webLocalItemImage: clearWebImage
+          ? null
+          : webLocalItemImage ?? this.webLocalItemImage,
     );
   }
 
@@ -65,5 +78,7 @@ class NewOrderState extends Equatable {
     totalPrice,
     itemDetails,
     selectedUnit,
+    localImagePath,
+    webLocalItemImage,
   ];
 }

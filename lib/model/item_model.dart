@@ -1,8 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 class NewOrderDetailsItemModel extends Equatable {
   final String? itemName;
   final int? quantity;
+  final String? localItemImage;
+  final Uint8List? webLocalItemImage;
+  String? imageUrl;
   final String? unit;
   final int? price;
   final int? totalItemsPrice;
@@ -13,11 +18,15 @@ class NewOrderDetailsItemModel extends Equatable {
     required this.price,
     required this.unit,
     required this.totalItemsPrice,
+    this.localItemImage,
+    this.webLocalItemImage,
+    this.imageUrl,
   });
 
   factory NewOrderDetailsItemModel.fromJson(Map<String, dynamic> json) {
     return NewOrderDetailsItemModel(
       itemName: json['itemName'] as String?,
+      imageUrl: json['imageUrl'] as String?,
       quantity: json['quantity'] as int?,
       unit: json['unit'] as String?,
       price: json['price'] as int?,
@@ -28,6 +37,7 @@ class NewOrderDetailsItemModel extends Equatable {
   Map<String, dynamic> toJson() {
     return {
       'itemName': itemName,
+      'imageUrl': imageUrl,
       'quantity': quantity,
       'unit': unit,
       'price': price,
@@ -36,5 +46,14 @@ class NewOrderDetailsItemModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [itemName, quantity, unit, price, totalItemsPrice];
+  List<Object?> get props => [
+    itemName,
+    localItemImage,
+    webLocalItemImage,
+    imageUrl,
+    quantity,
+    unit,
+    price,
+    totalItemsPrice,
+  ];
 }

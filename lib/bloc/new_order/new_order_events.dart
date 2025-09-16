@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:equatable/equatable.dart';
 
 abstract class NewOrderEvents extends Equatable {
@@ -6,6 +8,8 @@ abstract class NewOrderEvents extends Equatable {
 }
 
 class InitialState extends NewOrderEvents {}
+
+class ResetImageOnDialog extends NewOrderEvents {}
 
 class CustomerDetailGivenEvent extends NewOrderEvents {
   final String? name;
@@ -67,4 +71,10 @@ class ItemUnitChanged extends NewOrderEvents {
 
   @override
   List<Object?> get props => [itemUnit];
+}
+
+class PickItemImage extends NewOrderEvents {
+  final String? imagePath;
+  final Uint8List? webImage;
+  PickItemImage({this.imagePath, this.webImage});
 }

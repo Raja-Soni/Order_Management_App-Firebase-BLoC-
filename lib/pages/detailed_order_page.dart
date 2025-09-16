@@ -509,7 +509,7 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                 orientation ==
                                                     Orientation.landscape
                                                 ? 5
-                                                : 3,
+                                                : 4,
                                             child: CustomText(
                                               text: " Items",
                                               textColor: AppColor.whiteColor,
@@ -573,20 +573,76 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                             padding: const EdgeInsets.all(8.0),
                                             child: Row(
                                               children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) => AlertDialog(
+                                                        contentPadding:
+                                                            EdgeInsets.zero,
+                                                        content: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                          child:
+                                                              selectedOrder
+                                                                      .newOrderDetails![index]
+                                                                      .imageUrl ==
+                                                                  null
+                                                              ? const Icon(
+                                                                  Icons
+                                                                      .image_not_supported_rounded,
+                                                                  size: 100,
+                                                                )
+                                                              : Image.network(
+                                                                  height: 350,
+                                                                  width: 350,
+                                                                  selectedOrder
+                                                                      .newOrderDetails![index]
+                                                                      .imageUrl!,
+                                                                  fit: BoxFit
+                                                                      .cover,
+                                                                ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                  child:
+                                                      selectedOrder
+                                                              .newOrderDetails![index]
+                                                              .imageUrl ==
+                                                          null
+                                                      ? const Icon(
+                                                          Icons
+                                                              .image_not_supported_rounded,
+                                                        )
+                                                      : ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius.circular(
+                                                                10,
+                                                              ),
+                                                          child: Image.network(
+                                                            scale: 20,
+                                                            selectedOrder
+                                                                .newOrderDetails![index]
+                                                                .imageUrl!,
+                                                            fit: BoxFit.cover,
+                                                          ),
+                                                        ),
+                                                ),
                                                 Expanded(
-                                                  child: CustomText(
-                                                    alignment: TextAlign.start,
-                                                    text:
-                                                        "${index + 1}) ${selectedOrder.newOrderDetails![index].itemName}",
-                                                    maxLinesAllowed: 1,
-                                                    textColor:
-                                                        darkThemeState.darkTheme
-                                                        ? AppColor
-                                                              .textDarkThemeColor
-                                                        : AppColor
-                                                              .textLightThemeColor,
+                                                  child: SingleChildScrollView(
+                                                    scrollDirection:
+                                                        Axis.horizontal,
+                                                    child: CustomText(
+                                                      text:
+                                                          " ${index + 1}) ${selectedOrder.newOrderDetails![index].itemName}",
+                                                      maxLinesAllowed: 1,
+                                                    ),
                                                   ),
                                                 ),
+
                                                 Expanded(
                                                   child: CustomText(
                                                     alignment: TextAlign.end,
@@ -606,7 +662,7 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                   child: CustomText(
                                                     alignment: TextAlign.end,
                                                     text:
-                                                        "${selectedOrder.newOrderDetails![index].quantity} ${apiState.dataList[apiState.selectedOrderIndex].newOrderDetails![index].unit}",
+                                                        "${selectedOrder.newOrderDetails![index].quantity}${apiState.dataList[apiState.selectedOrderIndex].newOrderDetails![index].unit}",
                                                     textOverflow:
                                                         TextOverflow.ellipsis,
                                                     textColor:

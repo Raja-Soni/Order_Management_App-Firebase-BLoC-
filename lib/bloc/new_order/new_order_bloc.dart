@@ -1,14 +1,20 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:com.example.order_management_application/bloc/cloud_firebase_data/firebase_bloc_events_state.dart';
 import 'package:com.example.order_management_application/bloc/new_order/new_order_bloc_events_state.dart';
 import 'package:com.example.order_management_application/model/all_models.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
   FirebaseDbBloc apiBloc;
   NewOrderBloc(this.apiBloc) : super(NewOrderState()) {
     on<InitialState>(initialState);
+    on<ResetImageOnDialog>(resetImageOnDialog);
     on<CustomerDetailGivenEvent>(customerDetailGivenEvent);
     on<TotalPriceChangedEvent>(totalPriceChangedEvent);
     on<OrderDeliveryStatusChangedEvent>(orderDeliveryStatusChangedEvent);
@@ -17,12 +23,32 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
     on<ItemUnitChanged>(itemUnitChanged);
     on<RemoveItemFromList>(removeItemFromList);
     on<NewItemDetails>(newItemDetails);
+    on<PickItemImage>(pickItemImage);
   }
 
   FutureOr<void> initialState(InitialState event, Emitter<NewOrderState> emit) {
     emit(
-      state.copyWith(totalPrice: 0, isDelivered: "Pending", itemDetails: []),
+      state.copyWith(
+        totalPrice: 0,
+        isDelivered: "Pending",
+        itemDetails: [],
+        localImagePath: '',
+        clearWebImage: true,
+        address: '',
+        customerPhone: '',
+        itemName: '',
+        quantity: 0,
+        price: 0,
+        customerName: '',
+      ),
     );
+  }
+
+  FutureOr<void> resetImageOnDialog(
+    ResetImageOnDialog event,
+    Emitter<NewOrderState> emit,
+  ) {
+    emit(state.copyWith(clearWebImage: true, localImagePath: null));
   }
 
   FutureOr<void> customerDetailGivenEvent(
@@ -51,6 +77,50 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
   }
 
   addNewOrderEvent(AddNewOrderEvent event, Emitter<NewOrderState> emit) async {
+    final uid = FirebaseAuth.instance.currentUser!.uid;
+    final ordersRef = FirebaseFirestore.instance
+        .collection("users")
+        .doc(uid)
+        .collection("orders");
+
+    // Generate a new document reference with a unique ID
+    final orderDoc = ordersRef.doc(); // Firestore auto ID
+    final orderId = orderDoc.id;
+
+    // Upload images
+    for (var item in state.itemDetails) {
+      if (item.localItemImage != null) {
+        final fileName =
+            '${item.itemName}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+        try {
+          if (kIsWeb) {
+            final bytes = item.webLocalItemImage!;
+            await Supabase.instance.client.storage
+                .from('order_images')
+                .uploadBinary('$uid/$orderId/items/$fileName', bytes);
+          } else {
+            final file = File(item.localItemImage!);
+            await Supabase.instance.client.storage
+                .from('order_images')
+                .upload('$uid/$orderId/items/$fileName', file);
+          }
+
+          // Get public web image URL
+          final urlResponse = Supabase.instance.client.storage
+              .from('order_images')
+              .getPublicUrl('$uid/$orderId/items/$fileName');
+          if (urlResponse == null) {
+            item.imageUrl = null;
+          } else {
+            item.imageUrl = urlResponse; // save URL
+          }
+        } catch (e) {
+          print('Upload error: $e');
+          item.imageUrl = null;
+        }
+      }
+    }
+
     SalesOrderListItemModel newOrderItem = SalesOrderListItemModel(
       customer: state.customerName,
       customerPhone: state.customerPhone,
@@ -60,7 +130,11 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
       dateAndTime: DateTime.now().toString(),
       newOrderDetails: state.itemDetails,
     );
-    apiBloc.add(AddItem(item: newOrderItem));
+    try {
+      apiBloc.add(AddItem(item: newOrderItem));
+    } catch (e) {
+      print("Failed to Add order: " + e.toString());
+    }
   }
 
   FutureOr<void> orderDeliveryStatusChangedEvent(
@@ -78,6 +152,8 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
         List.from(state.itemDetails)..add(
           NewOrderDetailsItemModel(
             itemName: state.itemName,
+            localItemImage: state.localImagePath,
+            webLocalItemImage: state.webLocalItemImage,
             quantity: state.quantity,
             unit: state.selectedUnit,
             price: state.price,
@@ -87,6 +163,7 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
     emit(
       state.copyWith(
         itemDetails: updatedList,
+        localImagePath: '',
         price: 0,
         quantity: 0,
         selectedUnit: 'kg',
@@ -125,5 +202,17 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
     Emitter<NewOrderState> emit,
   ) {
     emit(state.copyWith(selectedUnit: event.itemUnit));
+  }
+
+  FutureOr<void> pickItemImage(
+    PickItemImage event,
+    Emitter<NewOrderState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        webLocalItemImage: event.webImage,
+        localImagePath: event.imagePath,
+      ),
+    );
   }
 }
