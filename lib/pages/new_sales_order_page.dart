@@ -276,7 +276,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                                   newOrderState.itemDetails[index].webLocalItemImage!,
                                                                                   height: 350,
                                                                                   width: 350,
-                                                                                  fit: BoxFit.cover,
+                                                                                  fit: BoxFit.contain,
                                                                                 ))
                                                                         : newOrderState.itemDetails[index].localItemImage ==
                                                                                   null ||
@@ -293,7 +293,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                               newOrderState.itemDetails[index].localItemImage!,
                                                                             ),
                                                                             fit:
-                                                                                BoxFit.cover,
+                                                                                BoxFit.contain,
                                                                           ),
                                                                   ),
                                                                 ),
@@ -317,8 +317,10 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                             newOrderState.itemDetails[index].webLocalItemImage!,
                                                                             fit:
                                                                                 BoxFit.cover,
-                                                                            scale:
-                                                                                20,
+                                                                            height:
+                                                                                30,
+                                                                            width:
+                                                                                30,
                                                                           ),
                                                                         ))
                                                                 : newOrderState
@@ -340,7 +342,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                         ),
                                                                     child: Image.file(
                                                                       scale:
-                                                                          70.0,
+                                                                          80.0,
                                                                       File(
                                                                         newOrderState
                                                                             .itemDetails[index]

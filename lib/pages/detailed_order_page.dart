@@ -602,7 +602,7 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                                       .newOrderDetails![index]
                                                                       .imageUrl!,
                                                                   fit: BoxFit
-                                                                      .cover,
+                                                                      .contain,
                                                                 ),
                                                         ),
                                                       ),
@@ -623,7 +623,8 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                                 10,
                                                               ),
                                                           child: Image.network(
-                                                            scale: 20,
+                                                            height: 30,
+                                                            width: 30,
                                                             selectedOrder
                                                                 .newOrderDetails![index]
                                                                 .imageUrl!,
