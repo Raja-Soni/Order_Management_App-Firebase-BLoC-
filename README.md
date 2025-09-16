@@ -12,7 +12,7 @@ A full-featured Flutter app for managing orders with real-time updates, advanced
   - List, create, delete, and view detailed orders.
   - Users can update the status of the orders.
   - Advanced filtering to quickly access relevant orders.
-  - Dynamic New Order page with itemized lists, auto-calculated totals, and input validation.
+  - Dynamic New Order page with itemized lists along with item images, auto-calculated totals, and input validation.
 
 - **State Management with BLoC**
   - Separation of UI and business logic using BLoC pattern.
