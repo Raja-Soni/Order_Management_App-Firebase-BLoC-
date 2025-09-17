@@ -258,6 +258,9 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                             ),
                                           ),
                                           IconButton(
+                                            focusColor: AppColor.focusColor,
+                                            highlightColor:
+                                                AppColor.confirmColor,
                                             onPressed: () {
                                               showDialog(
                                                 context: context,
@@ -443,9 +446,7 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                                     ElevatedButton(
                                                                       style: ElevatedButton.styleFrom(
                                                                         backgroundColor:
-                                                                            darkThemeState.darkTheme
-                                                                            ? AppColor.alertBtnDarkColor
-                                                                            : AppColor.alertBtnLightColor,
+                                                                            AppColor.confirmColor,
                                                                       ),
                                                                       onPressed: () {
                                                                         Navigator.pop(
@@ -456,9 +457,7 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                                         text:
                                                                             "OK",
                                                                         textColor:
-                                                                            darkThemeState.darkTheme
-                                                                            ? AppColor.textDarkThemeColor
-                                                                            : AppColor.textLightThemeColor,
+                                                                            AppColor.whiteColor,
                                                                       ),
                                                                     ),
                                                                   ],
