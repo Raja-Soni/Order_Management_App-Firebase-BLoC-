@@ -138,7 +138,8 @@ class ForgotPassWordPageState extends State<ForgotPassWordPage> {
                                               );
                                             }
                                           },
-                                          backgroundColor: Colors.blue.shade800,
+                                          backgroundColor: AppColor
+                                              .signInAndSignUpPageThemeColor,
                                         )
                                       : SizedBox.shrink(),
                                   firebaseAuthState.isForgotPassMailSent

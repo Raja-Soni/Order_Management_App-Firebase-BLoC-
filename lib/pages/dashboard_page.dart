@@ -472,9 +472,8 @@ class DashboardPage extends StatelessWidget {
                                                                 .confirmColor,
                                                             focusColor: AppColor
                                                                 .focusColor,
-                                                            hoverColor: Colors
-                                                                .red
-                                                                .shade100,
+                                                            hoverColor: AppColor
+                                                                .cancelLightShadeColor,
                                                             onTap: () {
                                                               showDialog(
                                                                 context:

@@ -423,7 +423,15 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                           ),
                                                         ],
                                                       ),
-                                                      trailing: GestureDetector(
+                                                      trailing: InkWell(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                              10,
+                                                            ),
+                                                        hoverColor: AppColor
+                                                            .cancelLightShadeColor,
+                                                        splashColor: AppColor
+                                                            .confirmColor,
                                                         child: Icon(
                                                           Icons.cancel_outlined,
                                                           color: AppColor

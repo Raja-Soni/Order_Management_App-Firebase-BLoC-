@@ -236,7 +236,8 @@ class SignInPageState extends State<UserAuthenticationPage> {
                                                   .add(AuthenticateUser());
                                             }
                                           },
-                                          backgroundColor: Colors.blue.shade800,
+                                          backgroundColor: AppColor
+                                              .signInAndSignUpPageThemeColor,
                                         ),
                                   SizedBox(height: 20),
                                   Row(
