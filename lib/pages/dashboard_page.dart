@@ -69,6 +69,9 @@ class DashboardPage extends StatelessWidget {
                                     : AppColor.textLightThemeColor,
                               ),
                               Switch(
+                                hoverColor: AppColor.confirmColor,
+                                focusColor: AppColor.focusColor,
+                                splashRadius: 18,
                                 trackOutlineColor: WidgetStatePropertyAll(
                                   Colors.transparent,
                                 ),
@@ -97,19 +100,17 @@ class DashboardPage extends StatelessWidget {
                       ),
                     ),
                     PopupMenuItem(
-                      child: TextButton(
-                        onPressed: () {
-                          context.read<FirebaseAuthBloc>().add(LogoutUser());
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            RouteNames.userAuthenticationPage,
-                            (route) => false,
-                          );
-                        },
-                        child: CustomText(
-                          text: "Logout",
-                          textColor: AppColor.cancelColor,
-                        ),
+                      onTap: () {
+                        context.read<FirebaseAuthBloc>().add(LogoutUser());
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          RouteNames.userAuthenticationPage,
+                          (route) => false,
+                        );
+                      },
+                      child: CustomText(
+                        text: "  Logout",
+                        textColor: AppColor.cancelColor,
                       ),
                     ),
                   ],
@@ -370,7 +371,7 @@ class DashboardPage extends StatelessWidget {
                                                   title: Row(
                                                     children: [
                                                       CustomContainer(
-                                                        width: 150,
+                                                        width: 120,
                                                         child: SingleChildScrollView(
                                                           scrollDirection:
                                                               Axis.horizontal,
@@ -428,68 +429,143 @@ class DashboardPage extends StatelessWidget {
                                                       ),
                                                     ],
                                                   ),
-                                                  trailing: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    spacing: 5,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
+                                                  trailing: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
                                                     children: [
-                                                      CustomContainer(
-                                                        height: 25,
-                                                        width: 90,
-                                                        backgroundColor:
-                                                            getStatusColor(
-                                                              dataList[index]
-                                                                  .status
-                                                                  .toString(),
-                                                            ),
-                                                        borderRadius: 20,
-                                                        child: Center(
-                                                          child: CustomText(
-                                                            text:
-                                                                dataList[index]
+                                                      Row(
+                                                        spacing: 25,
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          CustomContainer(
+                                                            height: 28,
+                                                            width: 90,
+                                                            backgroundColor:
+                                                                getStatusColor(
+                                                                  dataList[index]
+                                                                      .status
+                                                                      .toString(),
+                                                                ),
+                                                            borderRadius: 20,
+                                                            child: Center(
+                                                              child: CustomText(
+                                                                text: dataList[index]
                                                                     .status
                                                                     .toString(),
-                                                            textSize: 15,
-                                                            textColor:
-                                                                Colors.white,
-                                                            textBoldness:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      IconButton(
-                                                        padding:
-                                                            EdgeInsets.zero,
-                                                        alignment:
-                                                            AlignmentGeometry.xy(
-                                                              3.3,
-                                                              3.3,
+                                                                textSize: 15,
+                                                                textColor:
+                                                                    Colors
+                                                                        .white,
+                                                                textBoldness:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
                                                             ),
-                                                        highlightColor:
-                                                            Colors.red.shade200,
-                                                        onPressed: () {
-                                                          context
-                                                              .read<
-                                                                FirebaseDbBloc
-                                                              >()
-                                                              .add(
-                                                                DeleteItem(
-                                                                  id: dataList[index]
-                                                                      .id,
-                                                                  filter:
-                                                                      apiDbState
-                                                                          .filter,
+                                                          ),
+                                                          InkWell(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
                                                                 ),
+                                                            splashColor: AppColor
+                                                                .confirmColor,
+                                                            focusColor: AppColor
+                                                                .focusColor,
+                                                            hoverColor: Colors
+                                                                .red
+                                                                .shade100,
+                                                            onTap: () {
+                                                              showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (dialogCotext) {
+                                                                  return BlocBuilder<
+                                                                    FirebaseDbBloc,
+                                                                    FirebaseDbState
+                                                                  >(
+                                                                    buildWhen:
+                                                                        (
+                                                                          prev,
+                                                                          curr,
+                                                                        ) =>
+                                                                            prev.apiStatus !=
+                                                                            curr.apiStatus,
+                                                                    builder:
+                                                                        (
+                                                                          dialogCotext,
+                                                                          dialogApiState,
+                                                                        ) {
+                                                                          return AlertDialog(
+                                                                            backgroundColor:
+                                                                                darkModeState.darkTheme
+                                                                                ? AppColor.darkThemeColor
+                                                                                : AppColor.lightThemeColor,
+                                                                            title: CustomText(
+                                                                              text: "Delete Order?",
+                                                                              textSize: 20,
+                                                                              textBoldness: FontWeight.bold,
+                                                                              textColor: darkModeState.darkTheme
+                                                                                  ? AppColor.textDarkThemeColor
+                                                                                  : AppColor.textLightThemeColor,
+                                                                            ),
+                                                                            content: CustomText(
+                                                                              text: "Delete order permanently?\nThis action can’t be undone.",
+                                                                            ),
+                                                                            actions: [
+                                                                              ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(
+                                                                                  backgroundColor: AppColor.confirmColor,
+                                                                                ),
+                                                                                onPressed: () {
+                                                                                  context
+                                                                                      .read<
+                                                                                        FirebaseDbBloc
+                                                                                      >()
+                                                                                      .add(
+                                                                                        DeleteItem(
+                                                                                          id: dataList[index].id,
+                                                                                          filter: apiDbState.filter,
+                                                                                        ),
+                                                                                      );
+                                                                                  Navigator.pop(
+                                                                                    context,
+                                                                                  );
+                                                                                },
+                                                                                child: CustomText(
+                                                                                  text: "Yes",
+                                                                                  textColor: AppColor.whiteColor,
+                                                                                ),
+                                                                              ),
+                                                                              ElevatedButton(
+                                                                                style: ElevatedButton.styleFrom(
+                                                                                  backgroundColor: AppColor.cancelColor,
+                                                                                ),
+                                                                                onPressed: () {
+                                                                                  Navigator.pop(
+                                                                                    context,
+                                                                                  );
+                                                                                },
+                                                                                child: CustomText(
+                                                                                  text: "No",
+                                                                                  textColor: AppColor.whiteColor,
+                                                                                ),
+                                                                              ),
+                                                                            ],
+                                                                          );
+                                                                        },
+                                                                  );
+                                                                },
                                                               );
-                                                        },
-                                                        icon: Icon(
-                                                          Icons.delete,
-                                                          color:
-                                                              Colors.redAccent,
-                                                          size: 34,
-                                                        ),
+                                                            },
+                                                            child: Icon(
+                                                              Icons.delete,
+                                                              color: Colors
+                                                                  .redAccent,
+                                                              size: 35,
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ],
                                                   ),

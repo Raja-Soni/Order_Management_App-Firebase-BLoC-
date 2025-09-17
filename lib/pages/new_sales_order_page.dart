@@ -475,7 +475,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                       ? EdgeInsets.symmetric(
                                                           horizontal:
                                                               isSmallScreen
-                                                              ? screenWidth / 8
+                                                              ? screenWidth / 20
                                                               : 0,
                                                         )
                                                       : (orientation ==
@@ -484,7 +484,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                             ? EdgeInsets.symmetric(
                                                                 horizontal:
                                                                     screenWidth /
-                                                                    20,
+                                                                    22,
                                                               )
                                                             : EdgeInsets.symmetric(
                                                                 horizontal:
@@ -814,7 +814,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                                       : "Upload New Image")
                                                                                 : dialogNewItemState.localImagePath!.isEmpty
                                                                                 ? "Take/Upload Image"
-                                                                                : "Take/Upload New Image",
+                                                                                : "ReTake/ReUpload Image",
                                                                             textColor:
                                                                                 AppColor.linkTextColor,
                                                                           ),

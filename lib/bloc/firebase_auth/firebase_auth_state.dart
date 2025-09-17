@@ -7,6 +7,7 @@ class FirebaseAuthState extends Equatable {
   final String errorMessage;
   final String email;
   final String password;
+  final bool showPassword;
   final bool isForgotPassMailSent;
 
   const FirebaseAuthState({
@@ -16,6 +17,7 @@ class FirebaseAuthState extends Equatable {
     this.errorMessage = "",
     this.email = "",
     this.password = "",
+    this.showPassword=false,
     this.isForgotPassMailSent = false,
   });
 
@@ -26,6 +28,7 @@ class FirebaseAuthState extends Equatable {
     String? errorMessage,
     String? email,
     String? password,
+    bool? showPassword,
     bool? isForgotPassMailSent,
   }) {
     return FirebaseAuthState(
@@ -35,6 +38,7 @@ class FirebaseAuthState extends Equatable {
       errorMessage: errorMessage ?? this.errorMessage,
       email: email ?? this.email,
       password: password ?? this.password,
+      showPassword: showPassword ?? this.showPassword,
       isForgotPassMailSent: isForgotPassMailSent ?? this.isForgotPassMailSent,
     );
   }
@@ -47,6 +51,7 @@ class FirebaseAuthState extends Equatable {
     errorMessage,
     email,
     password,
+    showPassword,
     isForgotPassMailSent,
   ];
 }

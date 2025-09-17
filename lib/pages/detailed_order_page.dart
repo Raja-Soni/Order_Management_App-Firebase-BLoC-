@@ -260,7 +260,6 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                           IconButton(
                                             onPressed: () {
                                               showDialog(
-                                                barrierDismissible: false,
                                                 context: context,
                                                 builder: (dialogCotext) {
                                                   return BlocBuilder<

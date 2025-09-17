@@ -151,7 +151,9 @@ class SignInPageState extends State<UserAuthenticationPage> {
                                   ),
                                   SizedBox(height: 10),
                                   CustomFormTextField(
-                                    isPassword: true,
+                                    isPassword: firebaseAuthState.showPassword
+                                        ? false
+                                        : true,
                                     hintText: 'Password',
                                     inputType: TextInputType.visiblePassword,
                                     icon: Icon(Icons.password_outlined),
@@ -169,6 +171,21 @@ class SignInPageState extends State<UserAuthenticationPage> {
                                       );
                                       return null;
                                     },
+                                    trailingWidget: InkWell(
+                                      borderRadius: BorderRadius.circular(30),
+                                      radius: 10,
+                                      splashColor: AppColor.confirmColor,
+                                      onTap: () {
+                                        context.read<FirebaseAuthBloc>().add(
+                                          HidePassword(),
+                                        );
+                                      },
+                                      child: Icon(
+                                        firebaseAuthState.showPassword
+                                            ? Icons.visibility_outlined
+                                            : Icons.visibility_off_outlined,
+                                      ),
+                                    ),
                                   ),
                                   firebaseAuthState.isSignInPage
                                       ? Row(
@@ -191,7 +208,7 @@ class SignInPageState extends State<UserAuthenticationPage> {
                                           ],
                                         )
                                       : SizedBox.shrink(),
-                                  SizedBox(height: 30),
+                                  SizedBox(height: 20),
                                   firebaseAuthState.isLoading == true
                                       ? CircularProgressIndicator(
                                           color: darkThemeState.darkTheme

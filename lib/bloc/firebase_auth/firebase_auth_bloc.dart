@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class FirebaseAuthBloc extends Bloc<FirebaseAuthEvents, FirebaseAuthState> {
   FirebaseAuthBloc() : super(FirebaseAuthState()) {
     on<IsSignInPage>(isSignInPage);
+    on<HidePassword>(hidePassword);
     on<AuthenticateUser>(authenticateUser);
     on<CredentialGiven>(credentialGiven);
     on<LogoutUser>(logoutUser);
@@ -20,6 +21,17 @@ class FirebaseAuthBloc extends Bloc<FirebaseAuthEvents, FirebaseAuthState> {
     Emitter<FirebaseAuthState> emit,
   ) {
     emit(state.copyWith(isSignInPage: event.isSignInPage));
+  }
+
+  FutureOr<void> hidePassword(
+    HidePassword event,
+    Emitter<FirebaseAuthState> emit,
+  ) {
+    if (state.showPassword) {
+      emit(state.copyWith(showPassword: false));
+    } else {
+      emit(state.copyWith(showPassword: true));
+    }
   }
 
   FutureOr<void> credentialGiven(

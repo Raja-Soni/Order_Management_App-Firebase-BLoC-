@@ -68,7 +68,7 @@ class ForgotPassWordPageState extends State<ForgotPassWordPage> {
                                   ),
                                   SizedBox(height: 20),
                                   CustomFormTextField(
-                                    isfieldEnabeled:
+                                    isFieldEnabeled:
                                         firebaseAuthState.isForgotPassMailSent
                                         ? false
                                         : true,

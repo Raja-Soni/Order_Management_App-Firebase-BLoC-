@@ -22,7 +22,8 @@ class CustomFormTextField extends StatelessWidget {
   final FormFieldValidator<String>? validate;
   final FormFieldValidator<String>? savedValue;
   final FormFieldValidator<String>? changedValue;
-  final bool? isfieldEnabeled;
+  final bool? isFieldEnabeled;
+  final Widget? trailingWidget;
 
   const CustomFormTextField({
     super.key,
@@ -47,13 +48,14 @@ class CustomFormTextField extends StatelessWidget {
     this.validate,
     this.savedValue,
     this.changedValue,
-    this.isfieldEnabeled,
+    this.isFieldEnabeled,
+    this.trailingWidget,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      enabled: isfieldEnabeled,
+      enabled: isFieldEnabeled,
       obscureText: isPassword,
       onChanged: changedValue,
       validator: validate,
@@ -62,6 +64,7 @@ class CustomFormTextField extends StatelessWidget {
       keyboardType: inputType,
       cursorColor: cursorColor,
       decoration: InputDecoration(
+        suffixIcon: trailingWidget,
         prefixIcon: icon,
         prefixIconColor: iconColor,
         labelText: hintText,

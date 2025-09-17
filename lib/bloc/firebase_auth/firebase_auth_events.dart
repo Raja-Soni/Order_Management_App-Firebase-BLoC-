@@ -29,6 +29,10 @@ class LogoutUser extends FirebaseAuthEvents {}
 class IsForgotPassMailSent extends FirebaseAuthEvents {
   final bool? isMailSent;
   IsForgotPassMailSent({this.isMailSent});
+  @override
+  List<Object?> get props => [isMailSent];
 }
 
 class ForgotPasswordMailSentEvent extends FirebaseAuthEvents {}
+
+class HidePassword extends FirebaseAuthEvents {}
