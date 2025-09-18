@@ -285,6 +285,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         Expanded(
                                           flex: 6,
                                           child: CustomFormTextField(
+                                            inputType: TextInputType.name,
                                             changedValue: (value) {
                                               if (value != null) {
                                                 context
