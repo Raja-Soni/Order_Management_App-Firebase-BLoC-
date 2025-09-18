@@ -8,7 +8,19 @@ abstract class FirebaseDbEvents extends Equatable {
   List<Object?> get props => [];
 }
 
+class InitialDashboardPageState extends FirebaseDbEvents {}
+
 class FetchOnlineData extends FirebaseDbEvents {}
+
+class SearchOrderEvent extends FirebaseDbEvents {}
+
+class OrderToFindNameChangedEvent extends FirebaseDbEvents {
+  final String orderToFindName;
+  OrderToFindNameChangedEvent({required this.orderToFindName});
+
+  @override
+  List<Object?> get props => [orderToFindName];
+}
 
 class ApplyFilter extends FirebaseDbEvents {
   final Filters filter;

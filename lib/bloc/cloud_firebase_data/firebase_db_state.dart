@@ -9,6 +9,7 @@ class FirebaseDbState extends Equatable {
   final String message;
   final Filters filter;
   final int selectedOrderIndex;
+  final String searchOrderName;
 
   const FirebaseDbState({
     this.apiStatus = Status.loading,
@@ -16,6 +17,7 @@ class FirebaseDbState extends Equatable {
     this.message = "",
     this.filter = Filters.all,
     this.selectedOrderIndex = 0,
+    this.searchOrderName = "",
   });
 
   FirebaseDbState copyWith({
@@ -24,6 +26,7 @@ class FirebaseDbState extends Equatable {
     String? message,
     Filters? filter,
     int? selectedOrderIndex,
+    String? searchOrderName,
   }) {
     return FirebaseDbState(
       apiStatus: apiStatus ?? this.apiStatus,
@@ -31,6 +34,7 @@ class FirebaseDbState extends Equatable {
       message: message ?? this.message,
       filter: filter ?? this.filter,
       selectedOrderIndex: selectedOrderIndex ?? this.selectedOrderIndex,
+      searchOrderName: searchOrderName ?? this.searchOrderName,
     );
   }
 
@@ -41,5 +45,6 @@ class FirebaseDbState extends Equatable {
     message,
     filter,
     selectedOrderIndex,
+    searchOrderName,
   ];
 }

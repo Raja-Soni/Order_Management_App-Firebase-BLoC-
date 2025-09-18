@@ -11,10 +11,13 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
   OnlineDataBase dataBase = OnlineDataBase();
   List<SalesOrderListItemModel> tempList = [];
   FirebaseDbBloc() : super(FirebaseDbState()) {
+    on<InitialDashboardPageState>(initialDashboardPageState);
     on<FetchOnlineData>(fetchOnlineData);
     on<ApplyFilter>(applyFilter);
     on<DeleteItem>(deleteItem);
     on<AddItem>(addItem);
+    on<SearchOrderEvent>(searchOrderEvent);
+    on<OrderToFindNameChangedEvent>(orderToFindNameChangedEvent);
     on<DetailedOrderPage>(detailedOrderPage);
     on<UpdateSelectedOrderStatus>(updateSelectedOrderStatus);
   }
@@ -36,54 +39,6 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
     } catch (e) {
       emit(state.copyWith(apiStatus: Status.failure, message: e.toString()));
     }
-  }
-
-  applyFilter(ApplyFilter event, Emitter<FirebaseDbState> emit) async {
-    emit(state.copyWith(apiStatus: Status.loading, message: "loading"));
-    await dataBase.fetchData().then((value) {
-      tempList = getFilterList(filter: event.filter, value: value);
-      emit(
-        state.copyWith(
-          dataList: List.from(tempList),
-          message: "Filter applied",
-          apiStatus: Status.success,
-          filter: event.filter,
-        ),
-      );
-    });
-  }
-
-  deleteItem(DeleteItem event, Emitter<FirebaseDbState> emit) async {
-    emit(state.copyWith(apiStatus: Status.loading));
-    String? id = event.id;
-    await dataBase.deleteItem(id!);
-    await dataBase.fetchData().then((value) {
-      tempList = getFilterList(filter: event.filter, value: value);
-      emit(
-        state.copyWith(
-          dataList: List.from(tempList),
-          apiStatus: Status.success,
-          message: "Item Deleted",
-          filter: state.filter,
-        ),
-      );
-    });
-  }
-
-  addItem(AddItem event, Emitter<FirebaseDbState> emit) async {
-    emit(state.copyWith(apiStatus: Status.loading));
-    await dataBase.addItem(event.item!);
-    await dataBase.fetchData().then((value) {
-      tempList = List.from(value);
-      emit(
-        state.copyWith(
-          dataList: List.from(tempList),
-          apiStatus: Status.success,
-          message: "Item added",
-          filter: Filters.all,
-        ),
-      );
-    });
   }
 
   List<SalesOrderListItemModel> getFilterList({
@@ -111,11 +66,96 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
     }
   }
 
-  FutureOr<void> detailedOrderPage(
-    DetailedOrderPage event,
+  applyFilter(ApplyFilter event, Emitter<FirebaseDbState> emit) async {
+    emit(state.copyWith(apiStatus: Status.loading, message: "loading"));
+    await dataBase.fetchData().then((value) {
+      tempList = getFilterList(filter: event.filter, value: value);
+      emit(
+        state.copyWith(
+          dataList: List.from(tempList),
+          message: "Filter applied",
+          apiStatus: Status.success,
+          filter: event.filter,
+        ),
+      );
+    });
+  }
+
+  FutureOr<void> initialDashboardPageState(
+    InitialDashboardPageState event,
     Emitter<FirebaseDbState> emit,
   ) {
-    emit(state.copyWith(selectedOrderIndex: event.selectedOrderIndex));
+    emit(
+      state.copyWith(searchOrderName: '', message: "DashBoard Page Refresh"),
+    );
+  }
+
+  addItem(AddItem event, Emitter<FirebaseDbState> emit) async {
+    emit(state.copyWith(apiStatus: Status.loading));
+    await dataBase.addItem(event.item!);
+    await dataBase.fetchData().then((value) {
+      tempList = List.from(value);
+      emit(
+        state.copyWith(
+          dataList: List.from(tempList),
+          apiStatus: Status.success,
+          message: "Item added",
+          filter: Filters.all,
+        ),
+      );
+    });
+  }
+
+  deleteItem(DeleteItem event, Emitter<FirebaseDbState> emit) async {
+    emit(state.copyWith(apiStatus: Status.loading));
+    String? id = event.id;
+    await dataBase.deleteItem(id!);
+    await dataBase.fetchData().then((value) {
+      tempList = getFilterList(filter: event.filter, value: value);
+      emit(
+        state.copyWith(
+          dataList: List.from(tempList),
+          apiStatus: Status.success,
+          message: "Item Deleted",
+          filter: state.filter,
+        ),
+      );
+    });
+  }
+
+  FutureOr<void> orderToFindNameChangedEvent(
+    OrderToFindNameChangedEvent event,
+    Emitter<FirebaseDbState> emit,
+  ) {
+    emit(
+      state.copyWith(
+        searchOrderName: event.orderToFindName.toString().toLowerCase(),
+      ),
+    );
+  }
+
+  FutureOr<void> searchOrderEvent(
+    SearchOrderEvent event,
+    Emitter<FirebaseDbState> emit,
+  ) async {
+    emit(state.copyWith(apiStatus: Status.loading));
+    await dataBase.fetchData().then((value) {
+      tempList = getFilterList(filter: state.filter, value: value);
+      tempList = tempList
+          .where(
+            (order) => order.customer!.toLowerCase().contains(
+              state.searchOrderName.toLowerCase(),
+            ),
+          )
+          .toList();
+      emit(
+        state.copyWith(
+          dataList: List.from(tempList),
+          apiStatus: Status.success,
+          message: "Order Search Complete",
+        ),
+      );
+    });
   }
 
   FutureOr<void> updateSelectedOrderStatus(
@@ -134,5 +174,12 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
         ),
       );
     });
+  }
+
+  FutureOr<void> detailedOrderPage(
+    DetailedOrderPage event,
+    Emitter<FirebaseDbState> emit,
+  ) {
+    emit(state.copyWith(selectedOrderIndex: event.selectedOrderIndex));
   }
 }

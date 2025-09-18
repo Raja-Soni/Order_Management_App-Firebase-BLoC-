@@ -10,8 +10,21 @@ import '../custom_widgets/import_all_custom_widgets.dart';
 import '../routes/all_routes.dart';
 import '../utils/enums.dart';
 
-class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+class DashboardPage extends StatefulWidget {
+  DashboardPage({super.key});
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final GlobalKey<FormState> searchFormKey = GlobalKey();
+  @override
+  void initState() {
+    super.initState();
+    context.read<FirebaseDbBloc>().add(InitialDashboardPageState());
+  }
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.orientationOf(context);
@@ -39,7 +52,7 @@ class DashboardPage extends StatelessWidget {
                       ? Icon(Icons.list, size: 60, color: Colors.white)
                       : SizedBox.shrink(),
                   CustomText(
-                    text: "Order List",
+                    text: "Order Manager",
                     textSize: 33,
                     textBoldness: FontWeight.bold,
                     textColor: AppColor.appbarTitleTextColor,
@@ -168,7 +181,7 @@ class DashboardPage extends StatelessWidget {
                                           MainAxisAlignment.spaceBetween,
                                       children: [
                                         CustomText(
-                                          text: "Order Details",
+                                          text: "Order List",
                                           textSize: 30,
                                           textColor: darkModeState.darkTheme
                                               ? AppColor.textDarkThemeColor
@@ -259,17 +272,86 @@ class DashboardPage extends StatelessWidget {
                                     ),
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0,
+                                  ),
+                                  child: Form(
+                                    key: searchFormKey,
+                                    child: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          flex: 6,
+                                          child: CustomFormTextField(
+                                            changedValue: (value) {
+                                              if (value != null) {
+                                                context
+                                                    .read<FirebaseDbBloc>()
+                                                    .add(
+                                                      OrderToFindNameChangedEvent(
+                                                        orderToFindName: value,
+                                                      ),
+                                                    );
+                                              }
+                                              return null;
+                                            },
+                                            validate: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return "Search field is empty!!!";
+                                              }
+                                              return null;
+                                            },
+                                            hintText: "Search",
+                                            icon: Icon(Icons.search),
+                                          ),
+                                        ),
+                                        SizedBox(width: 15),
+                                        Expanded(
+                                          child: CustomButton(
+                                            backgroundColor:
+                                                darkModeState.darkTheme
+                                                ? AppColor.buttonDarkThemeColor
+                                                : AppColor
+                                                      .buttonLightThemeColor,
+                                            height: kIsWeb ? 48.0 : 54.0,
+                                            buttonText: "Go",
+                                            callback: () {
+                                              final isValidated = searchFormKey
+                                                  .currentState!
+                                                  .validate();
+                                              if (isValidated) {
+                                                context
+                                                    .read<FirebaseDbBloc>()
+                                                    .add(SearchOrderEvent());
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
                                 dataList.isEmpty
                                     ? Expanded(
                                         child: Center(
                                           child: Column(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.center,
-                                            spacing: 20,
+                                            spacing: 10,
                                             children: [
                                               CustomText(
                                                 alignment: TextAlign.center,
-                                                textSize: 40,
+                                                textSize: 35,
+                                                text: "No Orders Found",
+                                                textBoldness: FontWeight.bold,
+                                                textColor: AppColor.cancelColor,
+                                              ),
+                                              CustomText(
+                                                alignment: TextAlign.center,
+                                                textSize: 30,
                                                 text:
                                                     "${apiDbState.filter.name.toString().substring(0, 1).toUpperCase() + apiDbState.filter.name.toString().substring(1).toLowerCase()} orders: ${dataList.length}",
                                                 textBoldness: FontWeight.bold,
