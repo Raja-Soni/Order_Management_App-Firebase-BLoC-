@@ -285,7 +285,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         Expanded(
                                           flex: 6,
                                           child: CustomFormTextField(
-                                            inputType: TextInputType.name,
+                                            inputType: TextInputType.text,
                                             changedValue: (value) {
                                               if (value != null) {
                                                 context
@@ -335,6 +335,151 @@ class _DashboardPageState extends State<DashboardPage> {
                                     ),
                                   ),
                                 ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12.0,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      CustomText(
+                                        text: "Sort by: ",
+                                        textSize: 15,
+                                        textColor: darkModeState.darkTheme
+                                            ? AppColor.textDarkThemeColor
+                                            : AppColor.textLightThemeColor,
+                                      ),
+                                      Card(
+                                        color: darkModeState.darkTheme
+                                            ? AppColor.buttonDarkThemeColor
+                                            : AppColor.lightThemeColor,
+                                        child: DropdownButton(
+                                          isDense: true,
+                                          underline: SizedBox.shrink(),
+                                          padding: EdgeInsets.only(left: 8),
+                                          focusColor: AppColor.focusColor,
+                                          style: TextStyle(
+                                            color: darkModeState.darkTheme
+                                                ? AppColor.textDarkThemeColor
+                                                : AppColor.textLightThemeColor,
+                                          ),
+                                          dropdownColor: darkModeState.darkTheme
+                                              ? AppColor.darkThemeColor
+                                              : AppColor.lightThemeColor,
+                                          borderRadius: BorderRadius.circular(
+                                            10.0,
+                                          ),
+                                          value: apiDbState.sortList,
+                                          items: [
+                                            DropdownMenuItem(
+                                              value: Sorting.newestFirst,
+                                              child: CustomText(
+                                                text: "Newest First",
+                                                textSize: 15,
+                                              ),
+                                            ),
+                                            DropdownMenuItem(
+                                              value: Sorting.oldestFirst,
+                                              child: CustomText(
+                                                text: "Oldest First",
+                                                textSize: 15,
+                                              ),
+                                            ),
+                                          ],
+                                          onChanged: (value) {
+                                            if (value != null) {
+                                              context
+                                                  .read<FirebaseDbBloc>()
+                                                  .add(
+                                                    SortOrdersEvent(
+                                                      sort: value,
+                                                    ),
+                                                  );
+                                            }
+                                          },
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      CustomText(
+                                        text: "Date: ",
+                                        textSize: 15,
+                                        textColor: darkModeState.darkTheme
+                                            ? AppColor.textDarkThemeColor
+                                            : AppColor.textLightThemeColor,
+                                      ),
+                                      Card(
+                                        color: darkModeState.darkTheme
+                                            ? AppColor.buttonDarkThemeColor
+                                            : AppColor.lightThemeColor,
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 6.0,
+                                            vertical: 4.0,
+                                          ),
+                                          child: InkWell(
+                                            focusColor: AppColor.focusColor,
+                                            splashColor: AppColor.confirmColor,
+                                            radius: 10,
+                                            borderRadius: BorderRadius.circular(
+                                              5,
+                                            ),
+                                            onTap: () async {
+                                              final pickedDate =
+                                                  await showDatePicker(
+                                                    firstDate: DateTime(2025),
+                                                    lastDate: DateTime(2150),
+                                                    initialEntryMode:
+                                                        DatePickerEntryMode
+                                                            .calendarOnly,
+                                                    context: (context),
+                                                  );
+                                              if (pickedDate != null) {
+                                                print(
+                                                  "Picked Date: ${pickedDate.toString().split(" ").first}",
+                                                );
+                                                context
+                                                    .read<FirebaseDbBloc>()
+                                                    .add(
+                                                      ShowOrdersByDateEvent(
+                                                        selectedDate: pickedDate
+                                                            .toString(),
+                                                      ),
+                                                    );
+                                              }
+                                            },
+                                            child: Icon(
+                                              Icons.calendar_month_rounded,
+                                              size: 18,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                apiDbState.isRemoveFilterButtonVisible
+                                    ? Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          TextButton(
+                                            onPressed: () {
+                                              context
+                                                  .read<FirebaseDbBloc>()
+                                                  .add(
+                                                    RemoveAllFilters(
+                                                      reset: false,
+                                                    ),
+                                                  );
+                                            },
+                                            child: CustomText(
+                                              text: "Reset Filters",
+                                              textSize: 15,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : SizedBox.shrink(),
                                 dataList.isEmpty
                                     ? Expanded(
                                         child: Center(

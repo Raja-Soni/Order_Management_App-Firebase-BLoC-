@@ -14,9 +14,12 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
     on<InitialDashboardPageState>(initialDashboardPageState);
     on<FetchOnlineData>(fetchOnlineData);
     on<ApplyFilter>(applyFilter);
+    on<SortOrdersEvent>(sortOrdersEvent);
+    on<RemoveAllFilters>(removeAllFilters);
     on<DeleteItem>(deleteItem);
     on<AddItem>(addItem);
     on<SearchOrderEvent>(searchOrderEvent);
+    on<ShowOrdersByDateEvent>(showOrdersByDateEvent);
     on<OrderToFindNameChangedEvent>(orderToFindNameChangedEvent);
     on<DetailedOrderPage>(detailedOrderPage);
     on<UpdateSelectedOrderStatus>(updateSelectedOrderStatus);
@@ -86,8 +89,85 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
     Emitter<FirebaseDbState> emit,
   ) {
     emit(
-      state.copyWith(searchOrderName: '', message: "DashBoard Page Refresh"),
+      state.copyWith(
+        searchOrderName: '',
+        sortList: Sorting.newestFirst,
+        filter: Filters.all,
+        selectedDateToSearchOrders: state.selectedDateToSearchOrders,
+        message: "DashBoard Page Refresh",
+      ),
     );
+  }
+
+  FutureOr<void> sortOrdersEvent(
+    SortOrdersEvent event,
+    Emitter<FirebaseDbState> emit,
+  ) async {
+    emit(state.copyWith(sortList: event.sort, apiStatus: Status.loading));
+    await dataBase.fetchData().then((value) {
+      tempList = getFilterList(filter: state.filter, value: value);
+      if (state.sortList == Sorting.newestFirst) {
+        tempList = List.from(tempList);
+      } else {
+        tempList = List.from(tempList.reversed);
+      }
+      if (state.selectedDateToSearchOrders != null) {
+        tempList = tempList
+            .where(
+              (order) =>
+                  order.dateAndTime.toString().split(" ").first ==
+                  state.selectedDateToSearchOrders,
+            )
+            .toList();
+      }
+      emit(
+        state.copyWith(
+          dataList: tempList,
+          apiStatus: Status.success,
+          isRemoveFilterButtonVisible: true,
+          message: "Orders Sorted",
+        ),
+      );
+    });
+  }
+
+  FutureOr<void> showOrdersByDateEvent(
+    ShowOrdersByDateEvent event,
+    Emitter<FirebaseDbState> emit,
+  ) async {
+    emit(
+      state.copyWith(
+        sortList: state.sortList,
+        apiStatus: Status.loading,
+        selectedDateToSearchOrders: event.selectedDate
+            .toString()
+            .split(" ")
+            .first,
+      ),
+    );
+    await dataBase.fetchData().then((value) {
+      tempList = getFilterList(filter: state.filter, value: value);
+      if (state.sortList == Sorting.newestFirst) {
+        tempList = List.from(tempList);
+      } else {
+        tempList = List.from(tempList.reversed);
+      }
+      tempList = tempList
+          .where(
+            (order) =>
+                order.dateAndTime.toString().split(" ").first ==
+                event.selectedDate.toString().split(" ").first,
+          )
+          .toList();
+      emit(
+        state.copyWith(
+          dataList: tempList,
+          isRemoveFilterButtonVisible: true,
+          apiStatus: Status.success,
+          message: "Orders By Date",
+        ),
+      );
+    });
   }
 
   addItem(AddItem event, Emitter<FirebaseDbState> emit) async {
@@ -130,6 +210,7 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
     emit(
       state.copyWith(
         searchOrderName: event.orderToFindName.toString().toLowerCase(),
+        isRemoveFilterButtonVisible: true,
       ),
     );
   }
@@ -181,5 +262,23 @@ class FirebaseDbBloc extends Bloc<FirebaseDbEvents, FirebaseDbState> {
     Emitter<FirebaseDbState> emit,
   ) {
     emit(state.copyWith(selectedOrderIndex: event.selectedOrderIndex));
+  }
+
+  FutureOr<void> removeAllFilters(
+    RemoveAllFilters event,
+    Emitter<FirebaseDbState> emit,
+  ) async {
+    await dataBase.fetchData().then((value) {
+      emit(
+        state.copyWith(
+          dataList: List.from(value),
+          filter: Filters.all,
+          sortList: Sorting.newestFirst,
+          selectedDateToSearchOrders: null,
+          searchOrderName: "",
+          isRemoveFilterButtonVisible: event.reset,
+        ),
+      );
+    });
   }
 }

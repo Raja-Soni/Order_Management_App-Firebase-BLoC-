@@ -14,6 +14,22 @@ class FetchOnlineData extends FirebaseDbEvents {}
 
 class SearchOrderEvent extends FirebaseDbEvents {}
 
+class SortOrdersEvent extends FirebaseDbEvents {
+  final Sorting sort;
+  SortOrdersEvent({required this.sort});
+
+  @override
+  List<Object?> get props => [sort];
+}
+
+class ShowOrdersByDateEvent extends FirebaseDbEvents {
+  final String selectedDate;
+  ShowOrdersByDateEvent({required this.selectedDate});
+
+  @override
+  List<Object?> get props => [selectedDate];
+}
+
 class OrderToFindNameChangedEvent extends FirebaseDbEvents {
   final String orderToFindName;
   OrderToFindNameChangedEvent({required this.orderToFindName});
@@ -28,6 +44,14 @@ class ApplyFilter extends FirebaseDbEvents {
 
   @override
   List<Object?> get props => [filter];
+}
+
+class RemoveAllFilters extends FirebaseDbEvents {
+  final bool reset;
+  RemoveAllFilters({required this.reset});
+
+  @override
+  List<Object?> get props => [reset];
 }
 
 class DeleteItem extends FirebaseDbEvents {

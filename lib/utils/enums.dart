@@ -6,6 +6,8 @@ import '../AppColors/app_colors.dart';
 
 enum Status { loading, success, failure }
 
+enum Sorting { newestFirst, oldestFirst }
+
 enum Filters { all, today, pending, delivered, cancelled }
 
 Color getStatusColor(String status) {
