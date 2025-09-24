@@ -626,13 +626,19 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                               ),
                                               child: Row(
                                                 children: [
+                                                  SizedBox(width: 10),
                                                   Expanded(
                                                     flex:
                                                         orientation ==
                                                             Orientation
                                                                 .landscape
-                                                        ? 9
-                                                        : (kIsWeb ? 11 : 10),
+                                                        ? (kIsWeb ? 9 : 8)
+                                                        : (kIsWeb
+                                                              ? (screenWidth <
+                                                                        600
+                                                                    ? 17
+                                                                    : 15)
+                                                              : 16),
                                                     child: CustomText(
                                                       text: "Items",
                                                       textColor:
@@ -644,41 +650,11 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                         orientation ==
                                                             Orientation
                                                                 .landscape
-                                                        ? 3
-                                                        : (kIsWeb ? 4 : 5),
-                                                    child: CustomText(
-                                                      alignment:
-                                                          TextAlign.start,
-                                                      text: " Price",
-                                                      textColor:
-                                                          AppColor.whiteColor,
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    flex:
-                                                        orientation ==
-                                                            Orientation
-                                                                .landscape
-                                                        ? 3
-                                                        : (kIsWeb ? 6 : 5),
-                                                    child: CustomText(
-                                                      alignment:
-                                                          TextAlign.start,
-                                                      text: "    Qty",
-                                                      textColor:
-                                                          AppColor.whiteColor,
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    flex:
-                                                        orientation ==
-                                                            Orientation
-                                                                .landscape
-                                                        ? 6
-                                                        : (kIsWeb ? 5 : 7),
+                                                        ? (kIsWeb ? 3 : 3)
+                                                        : (kIsWeb ? 6 : 7),
                                                     child: CustomText(
                                                       alignment: TextAlign.end,
-                                                      text: "(₹)Total",
+                                                      text: "Price",
                                                       textColor:
                                                           AppColor.whiteColor,
                                                     ),
@@ -688,17 +664,60 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                         orientation ==
                                                             Orientation
                                                                 .landscape
-                                                        ? 5
+                                                        ? (kIsWeb ? 3 : 5)
+                                                        : (kIsWeb ? 8 : 8),
+                                                    child: CustomText(
+                                                      alignment: kIsWeb
+                                                          ? TextAlign.center
+                                                          : TextAlign.end,
+                                                      text: "  Qty",
+                                                      textColor:
+                                                          AppColor.whiteColor,
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    flex:
+                                                        orientation ==
+                                                            Orientation
+                                                                .landscape
+                                                        ? (kIsWeb ? 6 : 9)
+                                                        : (kIsWeb ? 13 : 19),
+                                                    child: CustomText(
+                                                      alignment: kIsWeb
+                                                          ? (screenWidth < 500
+                                                                ? TextAlign
+                                                                      .center
+                                                                : TextAlign.end)
+                                                          : TextAlign.center,
+                                                      text: kIsWeb
+                                                          ? "Total"
+                                                          : "   Total",
+                                                      textColor:
+                                                          AppColor.whiteColor,
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    flex:
+                                                        orientation ==
+                                                            Orientation
+                                                                .landscape
+                                                        ? (kIsWeb ? 5 : 4)
                                                         : (kIsWeb ? 6 : 8),
                                                     child: CustomText(
                                                       alignment:
-                                                          TextAlign.start,
-                                                      text: "   (Edit)",
+                                                          TextAlign.center,
+                                                      text: "Edit",
                                                       textColor:
                                                           AppColor.whiteColor,
                                                     ),
                                                   ),
-                                                  SizedBox(width: 10),
+                                                  SizedBox(
+                                                    width: kIsWeb
+                                                        ? (screenWidth < 600
+                                                              ? 30
+                                                              : 12)
+                                                        : 21,
+                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -881,7 +900,11 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                   TextAlign
                                                                       .center,
                                                               text:
-                                                                  "${newOrderState.itemDetails[index].quantity}${newOrderState.itemDetails[index].unit}",
+                                                                  kIsWeb &&
+                                                                      screenWidth <
+                                                                          500
+                                                                  ? "  ${newOrderState.itemDetails[index].quantity}${newOrderState.itemDetails[index].unit}"
+                                                                  : "${newOrderState.itemDetails[index].quantity}${newOrderState.itemDetails[index].unit}",
                                                               maxLinesAllowed:
                                                                   1,
                                                               textOverflow:
@@ -892,7 +915,14 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                           Expanded(
                                                             child: CustomText(
                                                               alignment:
-                                                                  TextAlign.end,
+                                                                  orientation ==
+                                                                          Orientation
+                                                                              .landscape &&
+                                                                      !kIsWeb
+                                                                  ? TextAlign
+                                                                        .center
+                                                                  : TextAlign
+                                                                        .end,
                                                               text:
                                                                   "₹${newOrderState.itemDetails[index].totalItemsPrice}",
                                                               maxLinesAllowed:
