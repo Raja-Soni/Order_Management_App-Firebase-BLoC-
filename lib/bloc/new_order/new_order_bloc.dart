@@ -20,8 +20,10 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
     on<OrderDeliveryStatusChangedEvent>(orderDeliveryStatusChangedEvent);
     on<OrderItemDetailedList>(orderItemDetailedList);
     on<AddNewOrderEvent>(addNewOrderEvent);
+    on<IsUpdatingItem>(isUpdatingItem);
     on<ItemUnitChanged>(itemUnitChanged);
     on<RemoveItemFromList>(removeItemFromList);
+    on<UpdateItemFromList>(updateItemFromList);
     on<NewItemDetails>(newItemDetails);
     on<PickItemImage>(pickItemImage);
   }
@@ -164,6 +166,7 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
       state.copyWith(
         itemDetails: updatedList,
         localImagePath: '',
+        clearWebImage: true,
         price: 0,
         quantity: 0,
         selectedUnit: 'kg',
@@ -212,6 +215,55 @@ class NewOrderBloc extends Bloc<NewOrderEvents, NewOrderState> {
       state.copyWith(
         webLocalItemImage: event.webImage,
         localImagePath: event.imagePath,
+      ),
+    );
+  }
+
+  FutureOr<void> isUpdatingItem(
+    IsUpdatingItem event,
+    Emitter<NewOrderState> emit,
+  ) {
+    emit(state.copyWith(isUpdatingItemDetails: event.isUpdating));
+  }
+
+  FutureOr<void> updateItemFromList(
+    UpdateItemFromList event,
+    Emitter<NewOrderState> emit,
+  ) {
+    List<NewOrderDetailsItemModel> updatedList = List.from(state.itemDetails);
+    final oldItem = updatedList[event.itemIndex];
+
+    final updatedItem = oldItem.copyWith(
+      itemName: state.itemName.isNotEmpty ? state.itemName : null,
+      localItemImage:
+          (state.localImagePath != null && state.localImagePath!.isNotEmpty)
+          ? state.localImagePath
+          : null,
+      webLocalItemImage:
+          (state.webLocalItemImage != null &&
+              state.webLocalItemImage!.isNotEmpty)
+          ? state.webLocalItemImage
+          : null,
+      quantity: state.quantity != 0 ? state.quantity : null,
+      unit: state.selectedUnit.isNotEmpty ? state.selectedUnit : null,
+      price: state.price != 0 ? state.price : null,
+      totalItemsPrice:
+          ((state.quantity != 0 ? state.quantity : (oldItem.quantity ?? 0)) *
+          (state.price != 0 ? state.price : (oldItem.price ?? 0))),
+    );
+
+    updatedList[event.itemIndex] = updatedItem;
+
+    emit(
+      state.copyWith(
+        itemDetails: updatedList,
+        localImagePath: "",
+        webLocalItemImage: null,
+        price: 0,
+        quantity: 0,
+        selectedUnit: 'kg',
+        itemName: "",
+        totalPrice: 0,
       ),
     );
   }

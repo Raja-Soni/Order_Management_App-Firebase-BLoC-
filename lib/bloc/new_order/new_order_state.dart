@@ -16,6 +16,7 @@ class NewOrderState extends Equatable {
   final Uint8List? webLocalItemImage;
   final List<NewOrderDetailsItemModel> itemDetails;
   final String selectedUnit;
+  final bool isUpdatingItemDetails;
   final units = ['kg', 'g', 'L', 'ml', 'pc', 'dozen', 'box', 'meter', 'cm'];
 
   NewOrderState({
@@ -31,6 +32,7 @@ class NewOrderState extends Equatable {
     this.selectedUnit = 'kg',
     this.localImagePath,
     this.webLocalItemImage = null,
+    this.isUpdatingItemDetails = false,
   });
 
   NewOrderState copyWith({
@@ -47,6 +49,7 @@ class NewOrderState extends Equatable {
     String? localImagePath,
     Uint8List? webLocalItemImage,
     bool clearWebImage = false,
+    bool? isUpdatingItemDetails,
   }) {
     return NewOrderState(
       customerName: customerName ?? this.customerName,
@@ -63,6 +66,8 @@ class NewOrderState extends Equatable {
       webLocalItemImage: clearWebImage
           ? null
           : webLocalItemImage ?? this.webLocalItemImage,
+      isUpdatingItemDetails:
+          isUpdatingItemDetails ?? this.isUpdatingItemDetails,
     );
   }
 
@@ -80,5 +85,6 @@ class NewOrderState extends Equatable {
     selectedUnit,
     localImagePath,
     webLocalItemImage,
+    isUpdatingItemDetails,
   ];
 }

@@ -26,6 +26,475 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
     context.read<NewOrderBloc>().add(InitialState());
   }
 
+  Widget showAddOrUpdateDialog({
+    index,
+    currentItemState,
+    required screenWidth,
+    required orientation,
+    required darkModeState,
+    dialogContext,
+  }) {
+    final isUpdating = index != null;
+    GlobalKey<FormState> itemFormKey = GlobalKey();
+    final nameController = isUpdating
+        ? TextEditingController(
+            text: currentItemState.itemDetails[index].itemName,
+          )
+        : TextEditingController();
+    final quantityController = isUpdating
+        ? TextEditingController(
+            text: currentItemState.itemDetails[index].quantity.toString(),
+          )
+        : TextEditingController();
+    final priceController = isUpdating
+        ? TextEditingController(
+            text:
+                (currentItemState.itemDetails[index].quantity *
+                        currentItemState.itemDetails[index].price)
+                    .toString(),
+          )
+        : TextEditingController();
+    return StatefulBuilder(
+      builder: (context, constraints) {
+        final width = MediaQuery.of(context).size.width;
+        final height = MediaQuery.of(context).size.height;
+        final isSmallScreen = width < 600;
+        return AlertDialog(
+          insetPadding: kIsWeb
+              ? EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? screenWidth / 20 : 0,
+                )
+              : (orientation == Orientation.portrait
+                    ? EdgeInsets.symmetric(horizontal: screenWidth / 22)
+                    : EdgeInsets.symmetric(horizontal: screenWidth / 5)),
+          backgroundColor: darkModeState.darkTheme
+              ? AppColor.dialogBackgroundDarkThemeColor
+              : AppColor.dialogBackgroundLightThemeColor,
+          title: Center(
+            child: CustomText(
+              text: isUpdating ? "Update Item Details" : "Enter Item Details",
+              textSize: 30,
+              textBoldness: FontWeight.bold,
+            ),
+          ),
+          content: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: isSmallScreen ? screenWidth : 400,
+              maxHeight: height * 0.85,
+            ),
+            child: SingleChildScrollView(
+              child: Form(
+                key: itemFormKey,
+                child: Column(
+                  spacing: 10,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    CustomFormTextField(
+                      textEditingController: nameController,
+                      inputType: TextInputType.name,
+                      hintText: isUpdating
+                          ? "Update Item Name"
+                          : "Enter Item Name",
+                      icon: Icon(Icons.person_outlined),
+                      validate: (value) {
+                        if (value == null || value.isEmpty) {
+                          return isUpdating
+                              ? "Please Update Item Name"
+                              : "Please Enter Item Name";
+                        }
+                        return null;
+                      },
+                      savedValue: (value) {
+                        context.read<NewOrderBloc>().add(
+                          NewItemDetails(itemName: value!),
+                        );
+                        return null;
+                      },
+                    ),
+                    CustomFormTextField(
+                      textEditingController: quantityController,
+                      inputType: TextInputType.number,
+                      hintText: isUpdating
+                          ? "Update Quantity"
+                          : "Enter Quantity",
+                      icon: Icon(Icons.numbers_rounded),
+                      validate: (value) {
+                        if (value == null || value.isEmpty) {
+                          return isUpdating
+                              ? "Please Update Quantity"
+                              : "Please Enter Quantity";
+                        }
+                        if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                          return "Only numbers allowed";
+                        }
+                        int quantity = int.parse(value.toString());
+                        if (quantity < 0) {
+                          return "Quantity must be more than 0";
+                        }
+
+                        return null;
+                      },
+                      savedValue: (value) {
+                        int quantity = int.parse(value.toString());
+                        context.read<NewOrderBloc>().add(
+                          NewItemDetails(quantity: quantity),
+                        );
+                        return null;
+                      },
+                    ),
+                    BlocBuilder<NewOrderBloc, NewOrderState>(
+                      builder: (context, dialogNewItemState) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            kIsWeb
+                                ? (dialogNewItemState.webLocalItemImage == null
+                                      ? (isUpdating &&
+                                                dialogNewItemState
+                                                        .itemDetails[index]
+                                                        .webLocalItemImage !=
+                                                    null
+                                            ? ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                child: Image.memory(
+                                                  scale: 20,
+                                                  fit: BoxFit.cover,
+                                                  dialogNewItemState
+                                                      .itemDetails[index]
+                                                      .webLocalItemImage!,
+                                                ),
+                                              )
+                                            : SizedBox.shrink())
+                                      : Image.memory(
+                                          dialogNewItemState.webLocalItemImage!,
+                                          scale: 20,
+                                          fit: BoxFit.cover,
+                                        ))
+                                : dialogNewItemState.localImagePath == null ||
+                                      dialogNewItemState.localImagePath!.isEmpty
+                                ? (isUpdating &&
+                                          dialogNewItemState
+                                              .itemDetails[index]
+                                              .localItemImage!
+                                              .isNotEmpty
+                                      ? ClipRRect(
+                                          borderRadius: BorderRadius.circular(
+                                            10,
+                                          ),
+                                          child: Image.file(
+                                            scale: 30,
+                                            fit: BoxFit.cover,
+                                            File(
+                                              dialogNewItemState
+                                                  .itemDetails[index]
+                                                  .localItemImage!,
+                                            ),
+                                          ),
+                                        )
+                                      : SizedBox.shrink())
+                                : ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.file(
+                                      scale: 30,
+                                      fit: BoxFit.cover,
+                                      File(dialogNewItemState.localImagePath!),
+                                    ),
+                                  ),
+                            TextButton(
+                              onPressed: () async {
+                                XFile? pickedImage;
+                                if (kIsWeb) {
+                                  final imagePicker = ImagePicker();
+                                  pickedImage = await imagePicker.pickImage(
+                                    source: ImageSource.gallery,
+                                  );
+                                  if (pickedImage != null) {
+                                    final bytes = await pickedImage
+                                        .readAsBytes();
+                                    if (bytes.isNotEmpty) {
+                                      final bloc =
+                                          BlocProvider.of<NewOrderBloc>(
+                                            dialogContext,
+                                          );
+                                      bloc.add(PickItemImage(webImage: bytes));
+                                    }
+                                  }
+                                } else {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) => BottomSheet(
+                                      onClosing: () {},
+                                      builder: (context) {
+                                        return Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                top: 8.0,
+                                              ),
+                                              child: CustomText(
+                                                textSize: 25,
+                                                text: "Select Media to Upload",
+                                              ),
+                                            ),
+                                            Row(
+                                              spacing: 20,
+                                              children: [
+                                                Padding(
+                                                  padding: EdgeInsets.only(
+                                                    left: 10.0,
+                                                  ),
+                                                  child: Column(
+                                                    children: [
+                                                      IconButton(
+                                                        padding: EdgeInsets.all(
+                                                          10,
+                                                        ),
+                                                        onPressed: () async {
+                                                          Navigator.pop(
+                                                            context,
+                                                          );
+                                                          final imagePicker =
+                                                              ImagePicker();
+                                                          pickedImage =
+                                                              await imagePicker
+                                                                  .pickImage(
+                                                                    source: ImageSource
+                                                                        .camera,
+                                                                  );
+                                                          if (pickedImage !=
+                                                              null) {
+                                                            final bloc =
+                                                                BlocProvider.of<
+                                                                  NewOrderBloc
+                                                                >(
+                                                                  dialogContext,
+                                                                );
+                                                            bloc.add(
+                                                              PickItemImage(
+                                                                imagePath:
+                                                                    pickedImage!
+                                                                        .path,
+                                                              ),
+                                                            );
+                                                          }
+                                                        },
+                                                        icon: Icon(
+                                                          Icons
+                                                              .camera_alt_rounded,
+                                                          size: 50,
+                                                        ),
+                                                      ),
+                                                      CustomText(
+                                                        text: "Camera",
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Column(
+                                                  children: [
+                                                    IconButton(
+                                                      padding: EdgeInsets.all(
+                                                        10,
+                                                      ),
+                                                      onPressed: () async {
+                                                        Navigator.pop(context);
+                                                        final imagePicker =
+                                                            ImagePicker();
+                                                        pickedImage =
+                                                            await imagePicker
+                                                                .pickImage(
+                                                                  source:
+                                                                      ImageSource
+                                                                          .gallery,
+                                                                );
+                                                        if (pickedImage !=
+                                                            null) {
+                                                          final bloc =
+                                                              BlocProvider.of<
+                                                                NewOrderBloc
+                                                              >(dialogContext);
+                                                          bloc.add(
+                                                            PickItemImage(
+                                                              imagePath:
+                                                                  pickedImage!
+                                                                      .path,
+                                                            ),
+                                                          );
+                                                        }
+                                                      },
+                                                      icon: Icon(
+                                                        Icons.image,
+                                                        size: 50,
+                                                      ),
+                                                    ),
+                                                    CustomText(text: "Gallery"),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 30),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  );
+                                }
+                              },
+                              child: CustomText(
+                                text: kIsWeb
+                                    ? (dialogNewItemState.webLocalItemImage !=
+                                                  null ||
+                                              isUpdating
+                                          ? "Upload New Image"
+                                          : "Upload Image")
+                                    : dialogNewItemState
+                                              .itemDetails[index]
+                                              .localItemImage!
+                                              .isNotEmpty &&
+                                          isUpdating
+                                    ? "ReTake/ReUpload Image"
+                                    : "Take/Upload Image",
+                                textColor: AppColor.linkTextColor,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CustomText(
+                          text: isUpdating ? "Update Unit: " : "Select Unit: ",
+                        ),
+                        BlocBuilder<NewOrderBloc, NewOrderState>(
+                          bloc: BlocProvider.of<NewOrderBloc>(context),
+                          builder: (dialogContext, dialogOrderState) {
+                            final selectedUnit = isUpdating
+                                ? (dialogOrderState.itemDetails[index].unit ??
+                                      dialogOrderState.units.first)
+                                : dialogOrderState.selectedUnit;
+                            return DropdownButton<String?>(
+                              style: TextStyle(
+                                color: darkModeState.darkTheme
+                                    ? AppColor.textDarkThemeColor
+                                    : AppColor.textLightThemeColor,
+                              ),
+                              dropdownColor: darkModeState.darkTheme
+                                  ? AppColor.darkThemeColor
+                                  : AppColor.lightThemeColor,
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: darkModeState.darkTheme
+                                    ? AppColor.iconDarkThemeColor
+                                    : AppColor.iconLightThemeColor,
+                              ),
+                              iconSize: 25,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              borderRadius: BorderRadius.circular(10),
+                              value: selectedUnit,
+                              items: dialogOrderState.units
+                                  .map(
+                                    (unit) => DropdownMenuItem(
+                                      child: CustomText(text: unit),
+                                      value: unit,
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (String? changedValue) {
+                                context.read<NewOrderBloc>().add(
+                                  ItemUnitChanged(itemUnit: changedValue!),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    CustomFormTextField(
+                      textEditingController: priceController,
+                      inputType: TextInputType.number,
+                      hintText: isUpdating ? "Update Price" : "Enter Price",
+                      icon: Icon(Icons.currency_rupee_rounded),
+                      validate: (value) {
+                        if (value == null || value.isEmpty) {
+                          return isUpdating
+                              ? "Please Update Price"
+                              : "Please Enter Price";
+                        }
+                        if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                          return "Only numbers allowed";
+                        }
+                        int price = int.parse(value.toString());
+                        if (price < 0) {
+                          return "Price must be more than 0";
+                        }
+
+                        return null;
+                      },
+                      savedValue: (value) {
+                        int price = int.parse(value.toString());
+                        context.read<NewOrderBloc>().add(
+                          NewItemDetails(price: price),
+                        );
+                        return null;
+                      },
+                    ),
+                    CustomButton(
+                      backgroundColor: darkModeState.darkTheme
+                          ? AppColor.buttonDarkThemeColor
+                          : AppColor.confirmColor,
+                      width: MediaQuery.of(context).size.width,
+                      buttonText: isUpdating ? "Update Item" : "Add Item",
+                      callback: () {
+                        bool isValidState = itemFormKey.currentState!
+                            .validate();
+                        if (isValidState) {
+                          itemFormKey.currentState!.save();
+                          if (isUpdating) {
+                            context.read<NewOrderBloc>().add(
+                              UpdateItemFromList(itemIndex: index),
+                            );
+                            context.read<NewOrderBloc>().add(
+                              ResetImageOnDialog(),
+                            );
+                          } else {
+                            context.read<NewOrderBloc>().add(
+                              OrderItemDetailedList(),
+                            );
+                          }
+                          context.read<NewOrderBloc>().add(
+                            TotalPriceChangedEvent(),
+                          );
+                          Navigator.of(context).pop();
+                        }
+                      },
+                    ),
+                    CustomButton(
+                      backgroundColor: darkModeState.darkTheme
+                          ? AppColor.buttonDarkThemeColor
+                          : AppColor.cancelColor,
+                      width: MediaQuery.of(context).size.width,
+                      buttonText: "Cancel",
+                      callback: () {
+                        context.read<NewOrderBloc>().add(ResetImageOnDialog());
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.orientationOf(context);
@@ -161,10 +630,10 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                         orientation ==
                                                             Orientation
                                                                 .landscape
-                                                        ? 6
-                                                        : 5,
+                                                        ? 9
+                                                        : (kIsWeb ? 11 : 10),
                                                     child: CustomText(
-                                                      text: "   Items",
+                                                      text: "Items",
                                                       textColor:
                                                           AppColor.whiteColor,
                                                     ),
@@ -175,11 +644,11 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                             Orientation
                                                                 .landscape
                                                         ? 3
-                                                        : 3,
+                                                        : (kIsWeb ? 4 : 5),
                                                     child: CustomText(
                                                       alignment:
                                                           TextAlign.start,
-                                                      text: "   Price",
+                                                      text: " Price",
                                                       textColor:
                                                           AppColor.whiteColor,
                                                     ),
@@ -189,12 +658,12 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                         orientation ==
                                                             Orientation
                                                                 .landscape
-                                                        ? 2
-                                                        : 2,
+                                                        ? 3
+                                                        : (kIsWeb ? 6 : 5),
                                                     child: CustomText(
                                                       alignment:
                                                           TextAlign.start,
-                                                      text: "  Qty",
+                                                      text: "    Qty",
                                                       textColor:
                                                           AppColor.whiteColor,
                                                     ),
@@ -204,16 +673,31 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                         orientation ==
                                                             Orientation
                                                                 .landscape
-                                                        ? 8
-                                                        : 7,
+                                                        ? 6
+                                                        : (kIsWeb ? 5 : 7),
                                                     child: CustomText(
-                                                      alignment:
-                                                          TextAlign.center,
-                                                      text: "Total Price",
+                                                      alignment: TextAlign.end,
+                                                      text: "(₹)Total",
                                                       textColor:
                                                           AppColor.whiteColor,
                                                     ),
                                                   ),
+                                                  Expanded(
+                                                    flex:
+                                                        orientation ==
+                                                            Orientation
+                                                                .landscape
+                                                        ? 5
+                                                        : (kIsWeb ? 6 : 8),
+                                                    child: CustomText(
+                                                      alignment:
+                                                          TextAlign.start,
+                                                      text: "   (Edit)",
+                                                      textColor:
+                                                          AppColor.whiteColor,
+                                                    ),
+                                                  ),
+                                                  SizedBox(width: 10),
                                                 ],
                                               ),
                                             ),
@@ -349,8 +833,9 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                                           5,
                                                                         ),
                                                                     child: Image.file(
-                                                                      scale:
-                                                                          80.0,
+                                                                      height:
+                                                                          20,
+                                                                      width: 30,
                                                                       File(
                                                                         newOrderState
                                                                             .itemDetails[index]
@@ -380,9 +865,11 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                               textOverflow:
                                                                   TextOverflow
                                                                       .ellipsis,
-                                                              alignment:
-                                                                  TextAlign
-                                                                      .right,
+                                                              alignment: kIsWeb
+                                                                  ? TextAlign
+                                                                        .end
+                                                                  : TextAlign
+                                                                        .center,
                                                               text:
                                                                   "₹${newOrderState.itemDetails[index].price}",
                                                             ),
@@ -423,39 +910,105 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                           ),
                                                         ],
                                                       ),
-                                                      trailing: InkWell(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              10,
-                                                            ),
-                                                        hoverColor: AppColor
-                                                            .cancelLightShadeColor,
-                                                        splashColor: AppColor
-                                                            .confirmColor,
-                                                        child: Icon(
-                                                          Icons.cancel_outlined,
-                                                          color: AppColor
-                                                              .cancelColor,
-                                                        ),
-                                                        onTap: () {
-                                                          context
-                                                              .read<
-                                                                NewOrderBloc
-                                                              >()
-                                                              .add(
-                                                                RemoveItemFromList(
-                                                                  itemIndex:
-                                                                      index,
+                                                      trailing: Row(
+                                                        mainAxisSize:
+                                                            MainAxisSize.min,
+                                                        children: [
+                                                          InkWell(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
                                                                 ),
+                                                            hoverColor: AppColor
+                                                                .focusColor,
+                                                            splashColor: AppColor
+                                                                .confirmColor,
+                                                            child: Icon(
+                                                              Icons.edit,
+                                                              color:
+                                                                  darkModeState
+                                                                      .darkTheme
+                                                                  ? AppColor
+                                                                        .editIconDarkThemeColor
+                                                                  : AppColor
+                                                                        .editIconLightThemeColor,
+                                                            ),
+                                                            onTap: () {
+                                                              context
+                                                                  .read<
+                                                                    NewOrderBloc
+                                                                  >()
+                                                                  .add(
+                                                                    IsUpdatingItem(
+                                                                      isUpdating:
+                                                                          true,
+                                                                    ),
+                                                                  );
+                                                              showDialog(
+                                                                context:
+                                                                    context,
+                                                                builder: (dialogContext) {
+                                                                  return showAddOrUpdateDialog(
+                                                                    index:
+                                                                        index,
+                                                                    dialogContext:
+                                                                        dialogContext,
+                                                                    currentItemState:
+                                                                        newOrderState,
+                                                                    screenWidth:
+                                                                        screenWidth,
+                                                                    orientation:
+                                                                        orientation,
+                                                                    darkModeState:
+                                                                        darkModeState,
+                                                                  );
+                                                                },
                                                               );
-                                                          context
-                                                              .read<
-                                                                NewOrderBloc
-                                                              >()
-                                                              .add(
-                                                                TotalPriceChangedEvent(),
-                                                              );
-                                                        },
+                                                              context
+                                                                  .read<
+                                                                    NewOrderBloc
+                                                                  >()
+                                                                  .add(
+                                                                    TotalPriceChangedEvent(),
+                                                                  );
+                                                            },
+                                                          ),
+                                                          InkWell(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
+                                                                ),
+                                                            hoverColor: AppColor
+                                                                .cancelLightShadeColor,
+                                                            splashColor: AppColor
+                                                                .confirmColor,
+                                                            child: Icon(
+                                                              Icons
+                                                                  .cancel_outlined,
+                                                              color: AppColor
+                                                                  .cancelColor,
+                                                            ),
+                                                            onTap: () {
+                                                              context
+                                                                  .read<
+                                                                    NewOrderBloc
+                                                                  >()
+                                                                  .add(
+                                                                    RemoveItemFromList(
+                                                                      itemIndex:
+                                                                          index,
+                                                                    ),
+                                                                  );
+                                                              context
+                                                                  .read<
+                                                                    NewOrderBloc
+                                                                  >()
+                                                                  .add(
+                                                                    TotalPriceChangedEvent(),
+                                                                  );
+                                                            },
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   );
@@ -467,590 +1020,14 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                       ),
                                     GestureDetector(
                                       onTap: () {
-                                        GlobalKey<FormState> itemFormKey =
-                                            GlobalKey();
                                         showDialog(
                                           context: context,
                                           builder: (dialogContext) {
-                                            return LayoutBuilder(
-                                              builder: (context, constraints) {
-                                                final width =
-                                                    constraints.maxWidth;
-                                                final isSmallScreen =
-                                                    width < 600;
-                                                return AlertDialog(
-                                                  insetPadding: kIsWeb
-                                                      ? EdgeInsets.symmetric(
-                                                          horizontal:
-                                                              isSmallScreen
-                                                              ? screenWidth / 20
-                                                              : 0,
-                                                        )
-                                                      : (orientation ==
-                                                                Orientation
-                                                                    .portrait
-                                                            ? EdgeInsets.symmetric(
-                                                                horizontal:
-                                                                    screenWidth /
-                                                                    22,
-                                                              )
-                                                            : EdgeInsets.symmetric(
-                                                                horizontal:
-                                                                    screenWidth /
-                                                                    5,
-                                                              )),
-                                                  backgroundColor:
-                                                      darkModeState.darkTheme
-                                                      ? AppColor
-                                                            .dialogBackgroundDarkThemeColor
-                                                      : AppColor
-                                                            .dialogBackgroundLightThemeColor,
-                                                  title: Center(
-                                                    child: CustomText(
-                                                      text:
-                                                          "Enter Item Details",
-                                                      textSize: 30,
-                                                      textBoldness:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  content: ConstrainedBox(
-                                                    constraints: BoxConstraints(
-                                                      maxWidth: isSmallScreen
-                                                          ? screenWidth
-                                                          : 400,
-                                                      maxHeight:
-                                                          constraints
-                                                              .maxHeight *
-                                                          0.85,
-                                                    ),
-                                                    child: SingleChildScrollView(
-                                                      child: Form(
-                                                        key: itemFormKey,
-                                                        child: Column(
-                                                          spacing: 10,
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          mainAxisSize:
-                                                              MainAxisSize.min,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            CustomFormTextField(
-                                                              inputType:
-                                                                  TextInputType
-                                                                      .name,
-                                                              hintText:
-                                                                  "Enter Item Name",
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .person_outlined,
-                                                              ),
-                                                              validate: (value) {
-                                                                if (value ==
-                                                                        null ||
-                                                                    value
-                                                                        .isEmpty) {
-                                                                  return "Please Enter Item Name";
-                                                                }
-                                                                return null;
-                                                              },
-                                                              savedValue: (value) {
-                                                                context
-                                                                    .read<
-                                                                      NewOrderBloc
-                                                                    >()
-                                                                    .add(
-                                                                      NewItemDetails(
-                                                                        itemName:
-                                                                            value!,
-                                                                      ),
-                                                                    );
-                                                                return null;
-                                                              },
-                                                            ),
-                                                            CustomFormTextField(
-                                                              inputType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              hintText:
-                                                                  "Enter Quantity",
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .numbers_rounded,
-                                                              ),
-                                                              validate: (value) {
-                                                                if (value ==
-                                                                        null ||
-                                                                    value
-                                                                        .isEmpty) {
-                                                                  return "Please Enter Quantity";
-                                                                }
-                                                                if (!RegExp(
-                                                                  r'^[0-9]+$',
-                                                                ).hasMatch(
-                                                                  value,
-                                                                )) {
-                                                                  return "Only numbers allowed";
-                                                                }
-                                                                int quantity =
-                                                                    int.parse(
-                                                                      value
-                                                                          .toString(),
-                                                                    );
-                                                                if (quantity <
-                                                                    0) {
-                                                                  return "Quantity must be more than 0";
-                                                                }
-
-                                                                return null;
-                                                              },
-                                                              savedValue: (value) {
-                                                                int quantity =
-                                                                    int.parse(
-                                                                      value
-                                                                          .toString(),
-                                                                    );
-                                                                context
-                                                                    .read<
-                                                                      NewOrderBloc
-                                                                    >()
-                                                                    .add(
-                                                                      NewItemDetails(
-                                                                        quantity:
-                                                                            quantity,
-                                                                      ),
-                                                                    );
-                                                                return null;
-                                                              },
-                                                            ),
-                                                            BlocBuilder<
-                                                              NewOrderBloc,
-                                                              NewOrderState
-                                                            >(
-                                                              builder:
-                                                                  (
-                                                                    context,
-                                                                    dialogNewItemState,
-                                                                  ) {
-                                                                    return Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .end,
-                                                                      children: [
-                                                                        kIsWeb
-                                                                            ? (dialogNewItemState.webLocalItemImage ==
-                                                                                      null
-                                                                                  ? const SizedBox.shrink()
-                                                                                  : Image.memory(
-                                                                                      dialogNewItemState.webLocalItemImage!,
-                                                                                      scale: 20,
-                                                                                      fit: BoxFit.cover,
-                                                                                    ))
-                                                                            : dialogNewItemState.localImagePath ==
-                                                                                      null ||
-                                                                                  dialogNewItemState.localImagePath!.isEmpty
-                                                                            ? const SizedBox.shrink()
-                                                                            : ClipRRect(
-                                                                                borderRadius: BorderRadius.circular(
-                                                                                  10,
-                                                                                ),
-                                                                                child: Image.file(
-                                                                                  scale: 30,
-                                                                                  fit: BoxFit.scaleDown,
-                                                                                  File(
-                                                                                    dialogNewItemState.localImagePath!,
-                                                                                  ),
-                                                                                ),
-                                                                              ),
-                                                                        TextButton(
-                                                                          onPressed: () async {
-                                                                            XFile?
-                                                                            pickedImage;
-                                                                            if (kIsWeb) {
-                                                                              final imagePicker = ImagePicker();
-                                                                              pickedImage = await imagePicker.pickImage(
-                                                                                source: ImageSource.gallery,
-                                                                              );
-                                                                              if (pickedImage !=
-                                                                                  null) {
-                                                                                final bytes = await pickedImage.readAsBytes();
-                                                                                if (bytes.isNotEmpty) {
-                                                                                  final bloc =
-                                                                                      BlocProvider.of<
-                                                                                        NewOrderBloc
-                                                                                      >(
-                                                                                        dialogContext,
-                                                                                      );
-                                                                                  bloc.add(
-                                                                                    PickItemImage(
-                                                                                      webImage: bytes,
-                                                                                    ),
-                                                                                  );
-                                                                                }
-                                                                              }
-                                                                            } else {
-                                                                              showModalBottomSheet(
-                                                                                context: context,
-                                                                                builder:
-                                                                                    (
-                                                                                      context,
-                                                                                    ) => BottomSheet(
-                                                                                      onClosing: () {},
-                                                                                      builder:
-                                                                                          (
-                                                                                            context,
-                                                                                          ) {
-                                                                                            return Column(
-                                                                                              mainAxisSize: MainAxisSize.min,
-                                                                                              children: [
-                                                                                                Padding(
-                                                                                                  padding: const EdgeInsets.only(
-                                                                                                    top: 8.0,
-                                                                                                  ),
-                                                                                                  child: CustomText(
-                                                                                                    textSize: 25,
-                                                                                                    text: "Select Media to Upload",
-                                                                                                  ),
-                                                                                                ),
-                                                                                                Row(
-                                                                                                  spacing: 20,
-                                                                                                  children: [
-                                                                                                    Padding(
-                                                                                                      padding: EdgeInsets.only(
-                                                                                                        left: 10.0,
-                                                                                                      ),
-                                                                                                      child: Column(
-                                                                                                        children: [
-                                                                                                          IconButton(
-                                                                                                            padding: EdgeInsets.all(
-                                                                                                              10,
-                                                                                                            ),
-                                                                                                            onPressed: () async {
-                                                                                                              Navigator.pop(
-                                                                                                                context,
-                                                                                                              );
-                                                                                                              final imagePicker = ImagePicker();
-                                                                                                              pickedImage = await imagePicker.pickImage(
-                                                                                                                source: ImageSource.camera,
-                                                                                                              );
-                                                                                                              if (pickedImage !=
-                                                                                                                  null) {
-                                                                                                                final bloc =
-                                                                                                                    BlocProvider.of<
-                                                                                                                      NewOrderBloc
-                                                                                                                    >(
-                                                                                                                      dialogContext,
-                                                                                                                    );
-                                                                                                                bloc.add(
-                                                                                                                  PickItemImage(
-                                                                                                                    imagePath: pickedImage!.path,
-                                                                                                                  ),
-                                                                                                                );
-                                                                                                              }
-                                                                                                            },
-                                                                                                            icon: Icon(
-                                                                                                              Icons.camera_alt_rounded,
-                                                                                                              size: 50,
-                                                                                                            ),
-                                                                                                          ),
-                                                                                                          CustomText(
-                                                                                                            text: "Camera",
-                                                                                                          ),
-                                                                                                        ],
-                                                                                                      ),
-                                                                                                    ),
-                                                                                                    Column(
-                                                                                                      children: [
-                                                                                                        IconButton(
-                                                                                                          padding: EdgeInsets.all(
-                                                                                                            10,
-                                                                                                          ),
-                                                                                                          onPressed: () async {
-                                                                                                            Navigator.pop(
-                                                                                                              context,
-                                                                                                            );
-                                                                                                            final imagePicker = ImagePicker();
-                                                                                                            pickedImage = await imagePicker.pickImage(
-                                                                                                              source: ImageSource.gallery,
-                                                                                                            );
-                                                                                                            if (pickedImage !=
-                                                                                                                null) {
-                                                                                                              final bloc =
-                                                                                                                  BlocProvider.of<
-                                                                                                                    NewOrderBloc
-                                                                                                                  >(
-                                                                                                                    dialogContext,
-                                                                                                                  );
-                                                                                                              bloc.add(
-                                                                                                                PickItemImage(
-                                                                                                                  imagePath: pickedImage!.path,
-                                                                                                                ),
-                                                                                                              );
-                                                                                                            }
-                                                                                                          },
-                                                                                                          icon: Icon(
-                                                                                                            Icons.image,
-                                                                                                            size: 50,
-                                                                                                          ),
-                                                                                                        ),
-                                                                                                        CustomText(
-                                                                                                          text: "Gallery",
-                                                                                                        ),
-                                                                                                      ],
-                                                                                                    ),
-                                                                                                  ],
-                                                                                                ),
-                                                                                                SizedBox(
-                                                                                                  height: 30,
-                                                                                                ),
-                                                                                              ],
-                                                                                            );
-                                                                                          },
-                                                                                    ),
-                                                                              );
-                                                                            }
-                                                                          },
-                                                                          child: CustomText(
-                                                                            text:
-                                                                                kIsWeb
-                                                                                ? (dialogNewItemState.webLocalItemImage ==
-                                                                                          null
-                                                                                      ? "Upload Image"
-                                                                                      : "Upload New Image")
-                                                                                : dialogNewItemState.localImagePath!.isEmpty
-                                                                                ? "Take/Upload Image"
-                                                                                : "ReTake/ReUpload Image",
-                                                                            textColor:
-                                                                                AppColor.linkTextColor,
-                                                                          ),
-                                                                        ),
-                                                                      ],
-                                                                    );
-                                                                  },
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                CustomText(
-                                                                  text:
-                                                                      "Select Unit: ",
-                                                                ),
-                                                                BlocBuilder<
-                                                                  NewOrderBloc,
-                                                                  NewOrderState
-                                                                >(
-                                                                  builder:
-                                                                      (
-                                                                        dialogContext,
-                                                                        dialogOrderState,
-                                                                      ) {
-                                                                        return DropdownButton(
-                                                                          style: TextStyle(
-                                                                            color:
-                                                                                darkModeState.darkTheme
-                                                                                ? AppColor.textDarkThemeColor
-                                                                                : AppColor.textLightThemeColor,
-                                                                          ),
-                                                                          dropdownColor:
-                                                                              darkModeState.darkTheme
-                                                                              ? AppColor.darkThemeColor
-                                                                              : AppColor.lightThemeColor,
-                                                                          icon: Icon(
-                                                                            Icons.arrow_drop_down,
-                                                                            color:
-                                                                                darkModeState.darkTheme
-                                                                                ? AppColor.iconDarkThemeColor
-                                                                                : AppColor.iconLightThemeColor,
-                                                                          ),
-                                                                          iconSize:
-                                                                              25,
-                                                                          padding: EdgeInsets.symmetric(
-                                                                            horizontal:
-                                                                                10,
-                                                                          ),
-                                                                          borderRadius: BorderRadius.circular(
-                                                                            10,
-                                                                          ),
-                                                                          value:
-                                                                              dialogOrderState.selectedUnit,
-                                                                          items: dialogOrderState
-                                                                              .units
-                                                                              .map(
-                                                                                (
-                                                                                  unit,
-                                                                                ) => DropdownMenuItem(
-                                                                                  child: CustomText(
-                                                                                    text: unit,
-                                                                                  ),
-                                                                                  value: unit,
-                                                                                ),
-                                                                              )
-                                                                              .toList(),
-                                                                          onChanged:
-                                                                              (
-                                                                                String?
-                                                                                changedValue,
-                                                                              ) {
-                                                                                context
-                                                                                    .read<
-                                                                                      NewOrderBloc
-                                                                                    >()
-                                                                                    .add(
-                                                                                      ItemUnitChanged(
-                                                                                        itemUnit: changedValue!,
-                                                                                      ),
-                                                                                    );
-                                                                              },
-                                                                        );
-                                                                      },
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            CustomFormTextField(
-                                                              inputType:
-                                                                  TextInputType
-                                                                      .number,
-                                                              hintText:
-                                                                  "Enter Price",
-                                                              icon: Icon(
-                                                                Icons
-                                                                    .currency_rupee_rounded,
-                                                              ),
-                                                              validate: (value) {
-                                                                if (value ==
-                                                                        null ||
-                                                                    value
-                                                                        .isEmpty) {
-                                                                  return "Please Enter Price";
-                                                                }
-                                                                if (!RegExp(
-                                                                  r'^[0-9]+$',
-                                                                ).hasMatch(
-                                                                  value,
-                                                                )) {
-                                                                  return "Only numbers allowed";
-                                                                }
-                                                                int
-                                                                price = int.parse(
-                                                                  value
-                                                                      .toString(),
-                                                                );
-                                                                if (price < 0) {
-                                                                  return "Price must be more than 0";
-                                                                }
-
-                                                                return null;
-                                                              },
-                                                              savedValue: (value) {
-                                                                int
-                                                                price = int.parse(
-                                                                  value
-                                                                      .toString(),
-                                                                );
-                                                                context
-                                                                    .read<
-                                                                      NewOrderBloc
-                                                                    >()
-                                                                    .add(
-                                                                      NewItemDetails(
-                                                                        price:
-                                                                            price,
-                                                                      ),
-                                                                    );
-                                                                return null;
-                                                              },
-                                                            ),
-                                                            CustomButton(
-                                                              backgroundColor:
-                                                                  darkModeState
-                                                                      .darkTheme
-                                                                  ? AppColor
-                                                                        .buttonDarkThemeColor
-                                                                  : AppColor
-                                                                        .confirmColor,
-                                                              width:
-                                                                  MediaQuery.of(
-                                                                    dialogContext,
-                                                                  ).size.width,
-                                                              buttonText:
-                                                                  "Add Item",
-                                                              callback: () {
-                                                                bool
-                                                                isValidState =
-                                                                    itemFormKey
-                                                                        .currentState!
-                                                                        .validate();
-
-                                                                if (isValidState) {
-                                                                  itemFormKey
-                                                                      .currentState!
-                                                                      .save();
-                                                                  context
-                                                                      .read<
-                                                                        NewOrderBloc
-                                                                      >()
-                                                                      .add(
-                                                                        OrderItemDetailedList(),
-                                                                      );
-                                                                  context
-                                                                      .read<
-                                                                        NewOrderBloc
-                                                                      >()
-                                                                      .add(
-                                                                        TotalPriceChangedEvent(),
-                                                                      );
-                                                                  context
-                                                                      .read<
-                                                                        NewOrderBloc
-                                                                      >()
-                                                                      .add(
-                                                                        ResetImageOnDialog(),
-                                                                      );
-                                                                  Navigator.of(
-                                                                    dialogContext,
-                                                                  ).pop();
-                                                                }
-                                                              },
-                                                            ),
-                                                            CustomButton(
-                                                              backgroundColor:
-                                                                  darkModeState
-                                                                      .darkTheme
-                                                                  ? AppColor
-                                                                        .buttonDarkThemeColor
-                                                                  : AppColor
-                                                                        .cancelColor,
-                                                              width:
-                                                                  MediaQuery.of(
-                                                                    dialogContext,
-                                                                  ).size.width,
-                                                              buttonText:
-                                                                  "Cancel",
-                                                              callback: () {
-                                                                context
-                                                                    .read<
-                                                                      NewOrderBloc
-                                                                    >()
-                                                                    .add(
-                                                                      ResetImageOnDialog(),
-                                                                    );
-                                                                Navigator.of(
-                                                                  dialogContext,
-                                                                ).pop();
-                                                              },
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                );
-                                              },
+                                            return showAddOrUpdateDialog(
+                                              screenWidth: screenWidth,
+                                              orientation: orientation,
+                                              darkModeState: darkModeState,
+                                              dialogContext: dialogContext,
                                             );
                                           },
                                         );

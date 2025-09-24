@@ -257,226 +257,223 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                               ),
                                             ),
                                           ),
-                                          IconButton(
-                                            focusColor: AppColor.focusColor,
-                                            highlightColor:
-                                                AppColor.confirmColor,
-                                            onPressed: () {
-                                              showDialog(
-                                                context: context,
-                                                builder: (dialogCotext) {
-                                                  return BlocBuilder<
-                                                    FirebaseDbBloc,
-                                                    FirebaseDbState
-                                                  >(
-                                                    buildWhen: (prev, curr) =>
-                                                        prev.apiStatus !=
-                                                        curr.apiStatus,
-                                                    builder:
-                                                        (
-                                                          dialogCotext,
-                                                          dialogApiState,
-                                                        ) {
-                                                          final currentOrder =
-                                                              dialogApiState
-                                                                  .dataList[apiState
-                                                                  .selectedOrderIndex];
-                                                          return AlertDialog(
-                                                            backgroundColor:
-                                                                darkThemeState
-                                                                    .darkTheme
-                                                                ? AppColor
-                                                                      .darkThemeColor
-                                                                : AppColor
-                                                                      .lightThemeColor,
-                                                            title: Center(
-                                                              child: CustomText(
-                                                                text:
+                                          selectedOrder.status == "Delivered" ||
+                                                  selectedOrder.status ==
+                                                      "Cancelled"
+                                              ? SizedBox.shrink()
+                                              : IconButton(
+                                                  focusColor:
+                                                      AppColor.focusColor,
+                                                  highlightColor:
+                                                      AppColor.confirmColor,
+                                                  onPressed: () {
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (dialogCotext) {
+                                                        return BlocBuilder<
+                                                          FirebaseDbBloc,
+                                                          FirebaseDbState
+                                                        >(
+                                                          buildWhen: (prev, curr) =>
+                                                              prev.apiStatus !=
+                                                              curr.apiStatus,
+                                                          builder:
+                                                              (
+                                                                dialogCotext,
+                                                                dialogApiState,
+                                                              ) {
+                                                                final currentOrder =
                                                                     dialogApiState
-                                                                            .apiStatus ==
-                                                                        Status
-                                                                            .loading
-                                                                    ? "Changing Order Status"
-                                                                    : "Order Status",
-                                                                textSize: 20,
-                                                                textBoldness:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                textColor:
-                                                                    darkThemeState
-                                                                        .darkTheme
-                                                                    ? AppColor
-                                                                          .textDarkThemeColor
-                                                                    : AppColor
-                                                                          .textLightThemeColor,
-                                                              ),
-                                                            ),
-                                                            content:
-                                                                dialogApiState
-                                                                        .apiStatus ==
-                                                                    Status
-                                                                        .loading
-                                                                ? SizedBox(
-                                                                    height: 50,
-                                                                    child: Center(
-                                                                      child: CircularProgressIndicator(
-                                                                        color:
-                                                                            darkThemeState.darkTheme
-                                                                            ? AppColor.circularProgressDarkColor
-                                                                            : AppColor.circularProgressLightColor,
-                                                                      ),
-                                                                    ),
-                                                                  )
-                                                                : SingleChildScrollView(
-                                                                    child: Column(
-                                                                      mainAxisSize:
-                                                                          MainAxisSize
-                                                                              .min,
-                                                                      children: [
-                                                                        Row(
-                                                                          children: [
-                                                                            Radio(
-                                                                              activeColor: AppColor.confirmColor,
-                                                                              value: "Pending",
-                                                                              groupValue: currentOrder.status,
-                                                                              onChanged:
-                                                                                  (
-                                                                                    value,
-                                                                                  ) {
-                                                                                    dialogCotext
-                                                                                        .read<
-                                                                                          FirebaseDbBloc
-                                                                                        >()
-                                                                                        .add(
-                                                                                          UpdateSelectedOrderStatus(
-                                                                                            id: selectedOrder.id!,
-                                                                                            updateStatus: value!,
-                                                                                          ),
-                                                                                        );
-                                                                                  },
-                                                                            ),
-                                                                            CustomText(
-                                                                              text: "Order Pending",
-                                                                              textSize: 20,
-                                                                              textColor: darkThemeState.darkTheme
-                                                                                  ? AppColor.textDarkThemeColor
-                                                                                  : AppColor.textLightThemeColor,
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              30,
-                                                                        ),
-                                                                        Row(
-                                                                          children: [
-                                                                            Radio(
-                                                                              activeColor: AppColor.confirmColor,
-                                                                              value: "Delivered",
-                                                                              groupValue: currentOrder.status,
-                                                                              onChanged:
-                                                                                  (
-                                                                                    value,
-                                                                                  ) {
-                                                                                    dialogCotext
-                                                                                        .read<
-                                                                                          FirebaseDbBloc
-                                                                                        >()
-                                                                                        .add(
-                                                                                          UpdateSelectedOrderStatus(
-                                                                                            id: selectedOrder.id!,
-                                                                                            updateStatus: value!,
-                                                                                          ),
-                                                                                        );
-                                                                                  },
-                                                                            ),
-                                                                            CustomText(
-                                                                              text: "Order Delivered",
-                                                                              textSize: 20,
-                                                                              textColor: darkThemeState.darkTheme
-                                                                                  ? AppColor.textDarkThemeColor
-                                                                                  : AppColor.textLightThemeColor,
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                        SizedBox(
-                                                                          width:
-                                                                              30,
-                                                                        ),
-                                                                        Row(
-                                                                          children: [
-                                                                            Radio(
-                                                                              activeColor: AppColor.confirmColor,
-                                                                              value: "Cancelled",
-                                                                              groupValue: currentOrder.status,
-                                                                              onChanged:
-                                                                                  (
-                                                                                    value,
-                                                                                  ) {
-                                                                                    dialogCotext
-                                                                                        .read<
-                                                                                          FirebaseDbBloc
-                                                                                        >()
-                                                                                        .add(
-                                                                                          UpdateSelectedOrderStatus(
-                                                                                            id: selectedOrder.id!,
-                                                                                            updateStatus: value!,
-                                                                                          ),
-                                                                                        );
-                                                                                  },
-                                                                            ),
-                                                                            CustomText(
-                                                                              text: "Order Cancelled",
-                                                                              textSize: 20,
-                                                                              textColor: darkThemeState.darkTheme
-                                                                                  ? AppColor.textDarkThemeColor
-                                                                                  : AppColor.textLightThemeColor,
-                                                                            ),
-                                                                          ],
-                                                                        ),
-                                                                      ],
+                                                                        .dataList[apiState
+                                                                        .selectedOrderIndex];
+                                                                return AlertDialog(
+                                                                  backgroundColor:
+                                                                      darkThemeState
+                                                                          .darkTheme
+                                                                      ? AppColor
+                                                                            .darkThemeColor
+                                                                      : AppColor
+                                                                            .lightThemeColor,
+                                                                  title: Center(
+                                                                    child: CustomText(
+                                                                      text:
+                                                                          dialogApiState.apiStatus ==
+                                                                              Status.loading
+                                                                          ? "Changing Order Status"
+                                                                          : "Order Status",
+                                                                      textSize:
+                                                                          20,
+                                                                      textBoldness:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                      textColor:
+                                                                          darkThemeState
+                                                                              .darkTheme
+                                                                          ? AppColor.textDarkThemeColor
+                                                                          : AppColor.textLightThemeColor,
                                                                     ),
                                                                   ),
-                                                            actions:
-                                                                apiState.apiStatus ==
-                                                                    Status
-                                                                        .loading
-                                                                ? []
-                                                                : [
-                                                                    ElevatedButton(
-                                                                      style: ElevatedButton.styleFrom(
-                                                                        backgroundColor:
-                                                                            AppColor.confirmColor,
-                                                                      ),
-                                                                      onPressed: () {
-                                                                        Navigator.pop(
-                                                                          context,
-                                                                        );
-                                                                      },
-                                                                      child: CustomText(
-                                                                        text:
-                                                                            "OK",
-                                                                        textColor:
-                                                                            AppColor.whiteColor,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                          );
-                                                        },
-                                                  );
-                                                },
-                                              );
-                                            },
-                                            icon: Icon(
-                                              Icons.edit,
-                                              size: 29,
-                                              color: darkThemeState.darkTheme
-                                                  ? AppColor
-                                                        .editIconDarkThemeColor
-                                                  : AppColor
-                                                        .editIconLightThemeColor,
-                                            ),
-                                          ),
+                                                                  content:
+                                                                      dialogApiState
+                                                                              .apiStatus ==
+                                                                          Status
+                                                                              .loading
+                                                                      ? SizedBox(
+                                                                          height:
+                                                                              50,
+                                                                          child: Center(
+                                                                            child: CircularProgressIndicator(
+                                                                              color: darkThemeState.darkTheme
+                                                                                  ? AppColor.circularProgressDarkColor
+                                                                                  : AppColor.circularProgressLightColor,
+                                                                            ),
+                                                                          ),
+                                                                        )
+                                                                      : SingleChildScrollView(
+                                                                          child: Column(
+                                                                            mainAxisSize:
+                                                                                MainAxisSize.min,
+                                                                            children: [
+                                                                              Row(
+                                                                                children: [
+                                                                                  Radio(
+                                                                                    activeColor: AppColor.confirmColor,
+                                                                                    value: "Pending",
+                                                                                    groupValue: currentOrder.status,
+                                                                                    onChanged:
+                                                                                        (
+                                                                                          value,
+                                                                                        ) {
+                                                                                          dialogCotext
+                                                                                              .read<
+                                                                                                FirebaseDbBloc
+                                                                                              >()
+                                                                                              .add(
+                                                                                                UpdateSelectedOrderStatus(
+                                                                                                  id: selectedOrder.id!,
+                                                                                                  updateStatus: value!,
+                                                                                                ),
+                                                                                              );
+                                                                                        },
+                                                                                  ),
+                                                                                  CustomText(
+                                                                                    text: "Order Pending",
+                                                                                    textSize: 20,
+                                                                                    textColor: darkThemeState.darkTheme
+                                                                                        ? AppColor.textDarkThemeColor
+                                                                                        : AppColor.textLightThemeColor,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: 30,
+                                                                              ),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Radio(
+                                                                                    activeColor: AppColor.confirmColor,
+                                                                                    value: "Delivered",
+                                                                                    groupValue: currentOrder.status,
+                                                                                    onChanged:
+                                                                                        (
+                                                                                          value,
+                                                                                        ) {
+                                                                                          dialogCotext
+                                                                                              .read<
+                                                                                                FirebaseDbBloc
+                                                                                              >()
+                                                                                              .add(
+                                                                                                UpdateSelectedOrderStatus(
+                                                                                                  id: selectedOrder.id!,
+                                                                                                  updateStatus: value!,
+                                                                                                ),
+                                                                                              );
+                                                                                        },
+                                                                                  ),
+                                                                                  CustomText(
+                                                                                    text: "Order Delivered",
+                                                                                    textSize: 20,
+                                                                                    textColor: darkThemeState.darkTheme
+                                                                                        ? AppColor.textDarkThemeColor
+                                                                                        : AppColor.textLightThemeColor,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                              SizedBox(
+                                                                                width: 30,
+                                                                              ),
+                                                                              Row(
+                                                                                children: [
+                                                                                  Radio(
+                                                                                    activeColor: AppColor.confirmColor,
+                                                                                    value: "Cancelled",
+                                                                                    groupValue: currentOrder.status,
+                                                                                    onChanged:
+                                                                                        (
+                                                                                          value,
+                                                                                        ) {
+                                                                                          dialogCotext
+                                                                                              .read<
+                                                                                                FirebaseDbBloc
+                                                                                              >()
+                                                                                              .add(
+                                                                                                UpdateSelectedOrderStatus(
+                                                                                                  id: selectedOrder.id!,
+                                                                                                  updateStatus: value!,
+                                                                                                ),
+                                                                                              );
+                                                                                        },
+                                                                                  ),
+                                                                                  CustomText(
+                                                                                    text: "Order Cancelled",
+                                                                                    textSize: 20,
+                                                                                    textColor: darkThemeState.darkTheme
+                                                                                        ? AppColor.textDarkThemeColor
+                                                                                        : AppColor.textLightThemeColor,
+                                                                                  ),
+                                                                                ],
+                                                                              ),
+                                                                            ],
+                                                                          ),
+                                                                        ),
+                                                                  actions:
+                                                                      apiState.apiStatus ==
+                                                                          Status
+                                                                              .loading
+                                                                      ? []
+                                                                      : [
+                                                                          ElevatedButton(
+                                                                            style: ElevatedButton.styleFrom(
+                                                                              backgroundColor: AppColor.confirmColor,
+                                                                            ),
+                                                                            onPressed: () {
+                                                                              Navigator.pop(
+                                                                                context,
+                                                                              );
+                                                                            },
+                                                                            child: CustomText(
+                                                                              text: "OK",
+                                                                              textColor: AppColor.whiteColor,
+                                                                            ),
+                                                                          ),
+                                                                        ],
+                                                                );
+                                                              },
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  icon: Icon(
+                                                    Icons.edit,
+                                                    size: 29,
+                                                    color:
+                                                        darkThemeState.darkTheme
+                                                        ? AppColor
+                                                              .editIconDarkThemeColor
+                                                        : AppColor
+                                                              .editIconLightThemeColor,
+                                                  ),
+                                                ),
                                         ],
                                       ),
                                     ],
@@ -584,11 +581,11 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                             : AppColor
                                                                   .lightThemeColor,
                                                         contentPadding:
-                                                            EdgeInsets.all(20),
+                                                            EdgeInsets.all(10),
                                                         content: ClipRRect(
                                                           borderRadius:
                                                               BorderRadius.circular(
-                                                                10,
+                                                                22,
                                                               ),
                                                           child:
                                                               selectedOrder
@@ -597,17 +594,60 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                                   null
                                                               ? const Icon(
                                                                   Icons
-                                                                      .image_not_supported_rounded,
+                                                                      .broken_image,
+                                                                  color: Colors
+                                                                      .grey,
                                                                   size: 100,
                                                                 )
                                                               : Image.network(
                                                                   height: 350,
                                                                   width: 350,
+                                                                  fit: BoxFit
+                                                                      .contain,
                                                                   selectedOrder
                                                                       .newOrderDetails![index]
                                                                       .imageUrl!,
-                                                                  fit: BoxFit
-                                                                      .contain,
+                                                                  loadingBuilder:
+                                                                      (
+                                                                        context,
+                                                                        child,
+                                                                        loadingProgress,
+                                                                      ) {
+                                                                        if (loadingProgress ==
+                                                                            null) {
+                                                                          return child;
+                                                                        } else {
+                                                                          return SizedBox(
+                                                                            height:
+                                                                                175,
+                                                                            width:
+                                                                                175,
+                                                                            child: Center(
+                                                                              child: CircularProgressIndicator(
+                                                                                padding: EdgeInsets.all(
+                                                                                  10.0,
+                                                                                ),
+                                                                                color: darkThemeState.darkTheme
+                                                                                    ? AppColor.circularProgressDarkColor
+                                                                                    : AppColor.circularProgressLightColor,
+                                                                              ),
+                                                                            ),
+                                                                          );
+                                                                        }
+                                                                      },
+                                                                  errorBuilder:
+                                                                      (
+                                                                        context,
+                                                                        error,
+                                                                        stackTrace,
+                                                                      ) {
+                                                                        return Center(
+                                                                          child: CustomText(
+                                                                            text:
+                                                                                "Failed to load image",
+                                                                          ),
+                                                                        );
+                                                                      },
                                                                 ),
                                                         ),
                                                       ),
@@ -619,8 +659,8 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                               .imageUrl ==
                                                           null
                                                       ? const Icon(
-                                                          Icons
-                                                              .image_not_supported_rounded,
+                                                          Icons.broken_image,
+                                                          color: Colors.grey,
                                                         )
                                                       : ClipRRect(
                                                           borderRadius:
@@ -634,6 +674,48 @@ class DetailedOrderPageState extends State<DetailedOrderPage> {
                                                                 .newOrderDetails![index]
                                                                 .imageUrl!,
                                                             fit: BoxFit.cover,
+                                                            loadingBuilder:
+                                                                (
+                                                                  context,
+                                                                  child,
+                                                                  loadingProgress,
+                                                                ) {
+                                                                  if (loadingProgress ==
+                                                                      null) {
+                                                                    return child;
+                                                                  } else {
+                                                                    return SizedBox(
+                                                                      height:
+                                                                          30,
+                                                                      width: 30,
+                                                                      child: Center(
+                                                                        child: CircularProgressIndicator(
+                                                                          padding: EdgeInsets.all(
+                                                                            10.0,
+                                                                          ),
+                                                                          color:
+                                                                              darkThemeState.darkTheme
+                                                                              ? AppColor.circularProgressDarkColor
+                                                                              : AppColor.circularProgressLightColor,
+                                                                        ),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                },
+                                                            errorBuilder:
+                                                                (
+                                                                  context,
+                                                                  error,
+                                                                  stackTrace,
+                                                                ) {
+                                                                  return Icon(
+                                                                    Icons
+                                                                        .broken_image,
+                                                                    size: 30,
+                                                                    color: Colors
+                                                                        .grey,
+                                                                  );
+                                                                },
                                                           ),
                                                         ),
                                                 ),

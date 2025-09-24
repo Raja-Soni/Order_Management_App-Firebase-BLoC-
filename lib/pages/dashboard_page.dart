@@ -25,6 +25,8 @@ class _DashboardPageState extends State<DashboardPage> {
     context.read<FirebaseDbBloc>().add(InitialDashboardPageState());
   }
 
+  final searchBarTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     final orientation = MediaQuery.orientationOf(context);
@@ -285,6 +287,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                         Expanded(
                                           flex: 6,
                                           child: CustomFormTextField(
+                                            textEditingController:
+                                                searchBarTextController,
                                             inputType: TextInputType.text,
                                             changedValue: (value) {
                                               if (value != null) {
@@ -411,42 +415,42 @@ class _DashboardPageState extends State<DashboardPage> {
                                         color: darkModeState.darkTheme
                                             ? AppColor.buttonDarkThemeColor
                                             : AppColor.lightThemeColor,
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 6.0,
-                                            vertical: 4.0,
+                                        child: InkWell(
+                                          focusColor: AppColor.focusColor,
+                                          splashColor: AppColor.confirmColor,
+                                          radius: 10,
+                                          borderRadius: BorderRadius.circular(
+                                            10,
                                           ),
-                                          child: InkWell(
-                                            focusColor: AppColor.focusColor,
-                                            splashColor: AppColor.confirmColor,
-                                            radius: 10,
-                                            borderRadius: BorderRadius.circular(
-                                              5,
-                                            ),
-                                            onTap: () async {
-                                              final pickedDate =
-                                                  await showDatePicker(
-                                                    firstDate: DateTime(2025),
-                                                    lastDate: DateTime(2150),
-                                                    initialEntryMode:
-                                                        DatePickerEntryMode
-                                                            .calendarOnly,
-                                                    context: (context),
-                                                  );
-                                              if (pickedDate != null) {
-                                                print(
-                                                  "Picked Date: ${pickedDate.toString().split(" ").first}",
+                                          onTap: () async {
+                                            final pickedDate =
+                                                await showDatePicker(
+                                                  firstDate: DateTime(2025),
+                                                  lastDate: DateTime(2150),
+                                                  initialEntryMode:
+                                                      DatePickerEntryMode
+                                                          .calendarOnly,
+                                                  context: (context),
                                                 );
-                                                context
-                                                    .read<FirebaseDbBloc>()
-                                                    .add(
-                                                      ShowOrdersByDateEvent(
-                                                        selectedDate: pickedDate
-                                                            .toString(),
-                                                      ),
-                                                    );
-                                              }
-                                            },
+                                            if (pickedDate != null) {
+                                              print(
+                                                "Picked Date: ${pickedDate.toString().split(" ").first}",
+                                              );
+                                              context
+                                                  .read<FirebaseDbBloc>()
+                                                  .add(
+                                                    ShowOrdersByDateEvent(
+                                                      selectedDate: pickedDate
+                                                          .toString(),
+                                                    ),
+                                                  );
+                                            }
+                                          },
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 6.0,
+                                              vertical: 4.0,
+                                            ),
                                             child: Icon(
                                               Icons.calendar_month_rounded,
                                               size: 18,
@@ -464,6 +468,7 @@ class _DashboardPageState extends State<DashboardPage> {
                                         children: [
                                           TextButton(
                                             onPressed: () {
+                                              searchBarTextController.clear();
                                               context
                                                   .read<FirebaseDbBloc>()
                                                   .add(

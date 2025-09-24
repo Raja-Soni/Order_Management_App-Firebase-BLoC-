@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomFormTextField extends StatelessWidget {
+  final TextEditingController? textEditingController;
   final Color? textColor;
   final String hintText;
   final Color? hintTextColor;
@@ -22,12 +23,13 @@ class CustomFormTextField extends StatelessWidget {
   final FormFieldValidator<String>? validate;
   final FormFieldValidator<String>? savedValue;
   final FormFieldValidator<String>? changedValue;
-  final bool? isFieldEnabeled;
+  final bool? isFieldEnabled;
   final Widget? trailingWidget;
 
   const CustomFormTextField({
     super.key,
     required this.hintText,
+    this.textEditingController,
     this.textColor,
     this.hintTextColor = Colors.grey,
     this.hintTextSize = 20,
@@ -48,14 +50,15 @@ class CustomFormTextField extends StatelessWidget {
     this.validate,
     this.savedValue,
     this.changedValue,
-    this.isFieldEnabeled,
+    this.isFieldEnabled,
     this.trailingWidget,
   });
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      enabled: isFieldEnabeled,
+      controller: textEditingController,
+      enabled: isFieldEnabled,
       obscureText: isPassword,
       onChanged: changedValue,
       validator: validate,

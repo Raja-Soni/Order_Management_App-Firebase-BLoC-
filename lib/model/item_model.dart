@@ -45,6 +45,26 @@ class NewOrderDetailsItemModel extends Equatable {
     };
   }
 
+  NewOrderDetailsItemModel copyWith({
+    String? itemName,
+    String? localItemImage,
+    Uint8List? webLocalItemImage,
+    int? quantity,
+    String? unit,
+    int? price,
+    int? totalItemsPrice,
+  }) {
+    return NewOrderDetailsItemModel(
+      itemName: itemName ?? this.itemName,
+      localItemImage: localItemImage ?? this.localItemImage,
+      webLocalItemImage: webLocalItemImage ?? this.webLocalItemImage,
+      quantity: quantity ?? this.quantity,
+      unit: unit ?? this.unit,
+      price: price ?? this.price,
+      totalItemsPrice: totalItemsPrice ?? this.totalItemsPrice,
+    );
+  }
+
   @override
   List<Object?> get props => [
     itemName,

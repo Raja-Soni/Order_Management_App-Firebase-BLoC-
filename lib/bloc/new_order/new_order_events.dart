@@ -57,6 +57,22 @@ class NewItemDetails extends NewOrderEvents {
   List<Object?> get props => [itemName, price, quantity];
 }
 
+class IsUpdatingItem extends NewOrderEvents {
+  final bool? isUpdating;
+  IsUpdatingItem({this.isUpdating});
+
+  @override
+  List<Object?> get props => [isUpdating];
+}
+
+class UpdateItemFromList extends NewOrderEvents {
+  final int itemIndex;
+  UpdateItemFromList({required this.itemIndex});
+
+  @override
+  List<Object?> get props => [itemIndex];
+}
+
 class RemoveItemFromList extends NewOrderEvents {
   final int itemIndex;
   RemoveItemFromList({required this.itemIndex});
