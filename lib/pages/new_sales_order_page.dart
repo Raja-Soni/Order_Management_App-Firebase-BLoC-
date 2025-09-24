@@ -27,7 +27,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
   }
 
   Widget showAddOrUpdateDialog({
-    index,
+    int? index,
     currentItemState,
     required screenWidth,
     required orientation,
@@ -351,7 +351,8 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                               isUpdating
                                           ? "Upload New Image"
                                           : "Upload Image")
-                                    : dialogNewItemState
+                                    : index != null &&
+                                          dialogNewItemState
                                               .itemDetails[index]
                                               .localItemImage!
                                               .isNotEmpty &&
@@ -1024,6 +1025,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                           context: context,
                                           builder: (dialogContext) {
                                             return showAddOrUpdateDialog(
+                                              index: null,
                                               screenWidth: screenWidth,
                                               orientation: orientation,
                                               darkModeState: darkModeState,
@@ -1154,14 +1156,16 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                         if (newOrderState.itemDetails.isEmpty) {
                                           message.showSnackBar(
                                             SnackBar(
+                                              backgroundColor:
+                                                  AppColor.cancelColor,
                                               width: kIsWeb ? 450 : screenWidth,
                                               behavior:
                                                   SnackBarBehavior.floating,
                                               content: Row(
                                                 children: [
                                                   Icon(
-                                                    Icons.cancel,
-                                                    color: AppColor.cancelColor,
+                                                    Icons.cancel_outlined,
+                                                    color: AppColor.whiteColor,
                                                   ),
                                                   Flexible(
                                                     child: CustomText(
@@ -1180,6 +1184,8 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                             0) {
                                           message.showSnackBar(
                                             SnackBar(
+                                              backgroundColor:
+                                                  AppColor.infoColor,
                                               width: kIsWeb ? 450 : screenWidth,
                                               behavior:
                                                   SnackBarBehavior.floating,
@@ -1187,7 +1193,7 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                 children: [
                                                   Icon(
                                                     Icons.info,
-                                                    color: AppColor.cancelColor,
+                                                    color: AppColor.whiteColor,
                                                   ),
                                                   CustomText(
                                                     text:
@@ -1209,6 +1215,8 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                           message
                                               .showSnackBar(
                                                 SnackBar(
+                                                  backgroundColor:
+                                                      AppColor.confirmColor,
                                                   width: kIsWeb
                                                       ? 450
                                                       : screenWidth,
@@ -1219,8 +1227,8 @@ class NewSalesOrderPageState extends State<NewSalesOrderPage> {
                                                     children: [
                                                       Icon(
                                                         Icons.check_circle,
-                                                        color: AppColor
-                                                            .confirmColor,
+                                                        color:
+                                                            AppColor.whiteColor,
                                                       ),
                                                       CustomText(
                                                         text: " Order Added",

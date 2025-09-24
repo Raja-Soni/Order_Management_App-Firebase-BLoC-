@@ -563,6 +563,8 @@ class _DashboardPageState extends State<DashboardPage> {
                                                               .darkThemeColor)
                                                   : AppColor.lightThemeColor,
                                               child: InkWell(
+                                                hoverColor:
+                                                    AppColor.onHoverColor,
                                                 focusColor: AppColor.focusColor,
                                                 borderRadius:
                                                     BorderRadius.circular(10),

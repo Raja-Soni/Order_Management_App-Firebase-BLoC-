@@ -45,5 +45,7 @@ class AppColor {
   static Color dialogBackgroundDarkThemeColor = Colors.grey.shade900;
   static Color focusColor = Colors.yellow;
   static Color linkTextColor = Colors.blue;
-  static Color cancelLightShadeColor = Colors.red.shade100;
+  static Color cancelLightShadeColor = Colors.red.shade200;
+  static Color onHoverColor = Colors.green.shade100;
+  static Color infoColor = Colors.blue;
 }
